@@ -1,0 +1,67 @@
+site_name: 化学データ分析コース（Python主・R副）
+site_description: 化学専攻の学生が、1回1テーマで初歩からPythonとRを学ぶ全100回コース
+site_author: ichirio
+# GitHub Pages 公開後、下2行の <USER> はあなたのGitHubユーザー名に置き換わります
+site_url: https://<USER>.github.io/chem-data-course/
+repo_url: https://github.com/<USER>/chem-data-course
+
+theme:
+  name: material
+  language: ja
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: ダークモードへ
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: ライトモードへ
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - footnotes
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+plugins:
+  - search:
+      lang: ja
+
+nav:
+  - はじめに: index.md
+  - ロードマップ（全100回）: roadmap.md
+  - 第1回 開発環境の構築: lessons/lesson-01.md
+  - 第2回 はじめてのPython: lessons/lesson-02.md
+  - 第3回 リストと辞書で化学を扱う: lessons/lesson-03.md
