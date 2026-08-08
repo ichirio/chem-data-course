@@ -84,3 +84,23 @@ nav:
       - 第34回 フィルタリングと条件抽出: lessons/lesson-34.md
       - 第35回 欠損値の扱い: lessons/lesson-35.md
       - 第36回 並べ替えと集計（groupby）: lessons/lesson-36.md
+      - 第37回 列の追加・計算・変換: lessons/lesson-37.md
+      - 第38回 複数データの結合（merge / concat）: lessons/lesson-38.md
+      - 第39回 ピボットテーブルとクロス集計: lessons/lesson-39.md
+      - 第40回 日付・時刻データの扱い: lessons/lesson-40.md
+      - 第41回 実験データの前処理レシピ: lessons/lesson-41.md
+      - 第42回 外れ値の検出: lessons/lesson-42.md
+      - 第43回 正規化・標準化: lessons/lesson-43.md
+      - 第44回 Excelの読み書き: lessons/lesson-44.md
+      - 第45回 まとめ演習：実験ノート分析: lessons/lesson-45.md
+  - 第5部　データ可視化:
+      - 第46回 matplotlib入門: lessons/lesson-46.md
+      - 第47回 折れ線・散布図・棒グラフ: lessons/lesson-47.md
+      - 第48回 ヒストグラムと分布: lessons/lesson-48.md
+      - 第49回 複数グラフとサブプロット: lessons/lesson-49.md
+      - 第50回 グラフの装飾: lessons/lesson-50.md
+      - 第51回 seabornで統計グラフ: lessons/lesson-51.md
+      - 第52回 相関のヒートマップ: lessons/lesson-52.md
+      - 第53回 箱ひげ図・バイオリン: lessons/lesson-53.md
+      - 第54回 論文品質の図をつくる: lessons/lesson-54.md
+      - 第55回 まとめ演習：反応速度の可視化: lessons/lesson-55.md
