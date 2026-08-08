@@ -87,6 +87,17 @@ nav:
       - 第18回 デバッグの基礎: lessons/lesson-18.md
       - 第19回 仮想環境とパッケージ管理: lessons/lesson-19.md
       - 第20回 まとめ演習：データ整理ツール: lessons/lesson-20.md
+  - 第3部　数値計算とNumPy:
+      - 第21回 NumPy入門: lessons/lesson-21.md
+      - 第22回 配列の生成と操作: lessons/lesson-22.md
+      - 第23回 ベクトルと行列の演算: lessons/lesson-23.md
+      - 第24回 ブロードキャスト: lessons/lesson-24.md
+      - 第25回 統計量をNumPyで: lessons/lesson-25.md
+      - 第26回 乱数とシミュレーション: lessons/lesson-26.md
+      - 第27回 単位換算: lessons/lesson-27.md
+      - 第28回 濃度計算を配列で: lessons/lesson-28.md
+      - 第29回 数値誤差と有効数字: lessons/lesson-29.md
+      - 第30回 まとめ演習：滴定曲線: lessons/lesson-30.md
   - 第4部　データ処理とpandas:
       - 第31回 pandas入門・DataFrame: lessons/lesson-31.md
       - 第32回 CSVを読み込む・書き出す: lessons/lesson-32.md
