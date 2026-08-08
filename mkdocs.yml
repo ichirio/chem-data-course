@@ -77,3 +77,10 @@ nav:
   - 第2部　Pythonの基礎:
       - 第9回 文字列操作: lessons/lesson-09.md
       - 第10回 エラーと例外処理: lessons/lesson-10.md
+  - 第4部　データ処理とpandas:
+      - 第31回 pandas入門・DataFrame: lessons/lesson-31.md
+      - 第32回 CSVを読み込む・書き出す: lessons/lesson-32.md
+      - 第33回 行と列の選択（loc / iloc）: lessons/lesson-33.md
+      - 第34回 フィルタリングと条件抽出: lessons/lesson-34.md
+      - 第35回 欠損値の扱い: lessons/lesson-35.md
+      - 第36回 並べ替えと集計（groupby）: lessons/lesson-36.md
