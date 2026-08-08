@@ -1,9 +1,8 @@
 site_name: 化学データ分析コース（Python主・R副）
 site_description: 化学専攻の学生が、1回1テーマで初歩からPythonとRを学ぶ全100回コース
 site_author: ichirio
-# GitHub Pages 公開後、下2行の <USER> はあなたのGitHubユーザー名に置き換わります
-site_url: https://<USER>.github.io/chem-data-course/
-repo_url: https://github.com/<USER>/chem-data-course
+site_url: https://ichirio.github.io/chem-data-course/
+repo_url: https://github.com/ichirio/chem-data-course
 
 theme:
   name: material
