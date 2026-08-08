@@ -77,6 +77,16 @@ nav:
   - 第2部　Pythonの基礎:
       - 第9回 文字列操作: lessons/lesson-09.md
       - 第10回 エラーと例外処理: lessons/lesson-10.md
+      - 第11回 モジュールとimport（math）: lessons/lesson-11.md
+      - 第12回 ファイルの読み書き: lessons/lesson-12.md
+      - 第13回 内包表記: lessons/lesson-13.md
+      - 第14回 ラムダと高階関数: lessons/lesson-14.md
+      - 第15回 クラス入門: lessons/lesson-15.md
+      - 第16回 Jupyter／セル実行: lessons/lesson-16.md
+      - 第17回 読みやすいコード: lessons/lesson-17.md
+      - 第18回 デバッグの基礎: lessons/lesson-18.md
+      - 第19回 仮想環境とパッケージ管理: lessons/lesson-19.md
+      - 第20回 まとめ演習：データ整理ツール: lessons/lesson-20.md
   - 第4部　データ処理とpandas:
       - 第31回 pandas入門・DataFrame: lessons/lesson-31.md
       - 第32回 CSVを読み込む・書き出す: lessons/lesson-32.md
