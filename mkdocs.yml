@@ -44,7 +44,11 @@ markdown_extensions:
       line_spans: __span
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.details
@@ -61,6 +65,15 @@ plugins:
 nav:
   - はじめに: index.md
   - ロードマップ（全100回）: roadmap.md
-  - 第1回 開発環境の構築: lessons/lesson-01.md
-  - 第2回 はじめてのPython: lessons/lesson-02.md
-  - 第3回 リストと辞書で化学を扱う: lessons/lesson-03.md
+  - 第1部　はじめの一歩:
+      - 第1回 開発環境の構築: lessons/lesson-01.md
+      - 第2回 はじめてのPython: lessons/lesson-02.md
+      - 第3回 リストと辞書で化学を扱う: lessons/lesson-03.md
+      - 第4回 条件分岐（if）: lessons/lesson-04.md
+      - 第5回 繰り返し（for / while）: lessons/lesson-05.md
+      - 第6回 関数をつくる: lessons/lesson-06.md
+      - 第7回 GitとGitHub: lessons/lesson-07.md
+      - 第8回 まとめ演習：分子量電卓: lessons/lesson-08.md
+  - 第2部　Pythonの基礎:
+      - 第9回 文字列操作: lessons/lesson-09.md
+      - 第10回 エラーと例外処理: lessons/lesson-10.md
