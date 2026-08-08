@@ -20,7 +20,37 @@
 
 ---
 
-## ステップ1　Miniforge を入れる（Python の土台）
+## ステップ0　すでに入っているか確認する（済みならスキップ）
+
+インストールを始める前に、**もう入っているものは飛ばして構いません**。ターミナル（Windows は「Miniforge Prompt」か「PowerShell」、Ubuntu は端末）で次を打って確認します。
+
+```bash
+python --version     # 例: Python 3.12.3  → 出れば Python は導入済み
+conda --version      # 例: conda 24.x     → 出れば Miniforge/conda 導入済み
+R --version          # 先頭に R version … → 出れば R は導入済み
+git --version        # 例: git version 2.x → 出れば Git は導入済み
+code --version       # 数字が出れば VS Code 導入済み
+```
+
+| 表示された | 出なかった（`command not found` 等） |
+|---|---|
+| そのツールのインストールは**スキップ**してOK | 該当ステップに従って入れる |
+
+!!! warning "「Python は入っているが conda は入っていない」場合"
+    パソコンにすでに Python があっても、**このコースでは `chem` という専用環境を1つ作って学ぶ**ことをおすすめします（他の作業と混ざらず、化学ライブラリの導入も安定するため）。
+    その方法は2通りあります。どちらか片方でOKです。
+
+    - **A. Miniforge/conda を使う（推奨）**… 化学ライブラリ（RDKit 等）が一番安定。ステップ1へ。
+    - **B. すでにある Python の `venv` を使う（conda を増やしたくない人向け）**… ステップ2の「venv 版」を参照。
+
+---
+
+## ステップ1　Miniforge を入れる（＝ Python 本体が入る）
+
+!!! info "conda が既にある人はスキップ"
+    ステップ0で `conda --version` が表示された人は、このステップは不要です。ステップ2へ進んでください。
+
+Miniforge を入れると、**Python 本体も一緒に入ります**（別途 Python を入れる必要はありません）。
 
 === "Windows 11"
 
@@ -57,33 +87,146 @@ python --version
 
 ## ステップ2　学習用の環境をつくる
 
-プロジェクトごとに Python 環境を分けておくと、後でトラブりません。`chem` という名前の環境をつくり、よく使うライブラリを入れます。
+パソコンには色々な作業が混ざります。**プロジェクト専用の「環境」を1つ作って隔離**しておくと、後でトラブりません。`chem` という名前の環境を作ります。方法は2通り、**どちらか片方でOK**です。
+
+=== "A. conda で作る（推奨）"
+
+    化学ライブラリ（RDKit 等）が一番安定します。迷ったらこちら。
+
+    ```bash
+    # chem という名前の環境を作る（Python 3.12 を指定）
+    conda create -n chem python=3.12 -y
+
+    # 作った環境に「入る」（これ以降、行の先頭が (chem) になる）
+    conda activate chem
+    ```
+
+=== "B. venv で作る（すでにPythonがあり、condaを増やしたくない人）"
+
+    OSに入っている Python をそのまま使い、標準機能の `venv` で環境を分けます。
+
+    ```bash
+    # 好きな作業フォルダの中で実行（例：chem-course フォルダ）
+    python -m venv chem-env          # chem-env という環境フォルダを作る
+
+    # 環境に「入る」
+    # Windows (PowerShell):
+    chem-env\Scripts\Activate.ps1
+    # Ubuntu / macOS:
+    source chem-env/bin/activate
+    ```
+
+    入ると行の先頭に `(chem-env)` と表示されます。
+
+!!! tip "毎回のはじめに（超重要）"
+    作業を始めるたびに、環境に「入る」操作が必要です。
+    先頭が `(chem)`（またはvenvなら `(chem-env)`）になっているか、毎回確認してください。
+    なっていなければ conda は `conda activate chem`、venv は上の activate コマンドを実行します。
+
+---
+
+## ステップ2.5　パッケージの入れ方（conda と pip）
+
+Python の便利な機能は「パッケージ（ライブラリ）」として配られています。それを入れる道具が **conda** と **pip** の2つです。ここは一生使う知識なので、基本だけ押さえましょう。
+
+### conda と pip の使い分け
+
+| | conda | pip |
+|---|---|---|
+| 入手元 | conda-forge など | PyPI（Pythonの公式倉庫） |
+| 得意 | 科学・化学系（**RDKit**, NumPy など、内部でC/C++を使う重いもの） | Python製の軽いパッケージ全般。**世界標準** |
+| 使える環境 | conda環境のみ | conda環境でも venv でも使える |
+
+!!! note "かんたんな方針"
+    - **conda環境（方法A）を使う人**：化学・科学系は **conda** で、conda に無いものだけ **pip** で。
+    - **venv（方法B）を使う人**：すべて **pip** で入れます（venvにcondaは使えません）。
+    - どちらでも、**pip はほぼ必ず使う**ので、pip の使い方は覚えておきましょう。
+
+### まず定番パッケージを入れる
+
+=== "conda環境の人"
+
+    ```bash
+    # 科学・化学系は conda-forge から（安定）
+    conda install -c conda-forge numpy pandas matplotlib seaborn scikit-learn jupyter -y
+    ```
+
+=== "venvの人"
+
+    ```bash
+    # すべて pip で
+    pip install numpy pandas matplotlib seaborn scikit-learn jupyter
+    ```
+
+### pip の基本コマンド（丸ごと覚える価値あり）
+
+環境に入った状態（先頭が `(chem)` 等）で使います。
 
 ```bash
-# chem という名前の環境を作る（Python 3.12 を指定）
-conda create -n chem python=3.12 -y
-
-# 作った環境に入る（これ以降、先頭が (chem) になる）
-conda activate chem
-
-# 学習で使う定番ライブラリをまとめて入れる
-conda install -c conda-forge numpy pandas matplotlib seaborn scikit-learn jupyter -y
+pip install pandas              # 入れる
+pip install "pandas==2.2.0"     # バージョンを指定して入れる
+pip install --upgrade pandas    # 最新に更新する
+pip uninstall pandas            # 消す
+pip list                        # 今入っているもの一覧
+pip show pandas                 # 詳細（バージョン・保存場所など）
 ```
 
-!!! tip "毎回のはじめに"
-    次回以降、作業を始めるときは必ず `conda activate chem` を実行して、先頭が `(chem)` になっていることを確認してください。
+!!! tip "requirements.txt で「まとめて再現」"
+    使ったパッケージを一覧ファイルに書き出しておくと、別のPCでも一発で同じ環境を再現できます。研究の再現性にも直結する大事な習慣です。
+    ```bash
+    pip freeze > requirements.txt      # 今の環境を書き出す
+    pip install -r requirements.txt    # 別のPCでまとめて入れる
+    ```
 
-化学専用ライブラリ **RDKit** も入れておきましょう（第6部で本格的に使います）。
+!!! warning "conda環境で pip を使うときの注意"
+    conda環境の中で pip も使えますが、**同じパッケージを conda と pip の両方で入れない**でください（競合の原因）。
+    「基本は conda、conda に無いものだけ pip」と役割を分ければ安全です。
+
+### 化学専用ライブラリ RDKit を入れる
+
+第6部（ケモインフォマティクス）で使う **RDKit** も入れておきましょう。
+
+=== "conda環境の人（推奨）"
+
+    ```bash
+    conda install -c conda-forge rdkit -y
+    ```
+
+=== "venvの人"
+
+    ```bash
+    pip install rdkit
+    ```
+
+### 動作確認
 
 ```bash
-conda install -c conda-forge rdkit -y
+python -c "import numpy, pandas, matplotlib, rdkit; print('OK: 主要パッケージが使えます')"
 ```
 
-R も入れておきます（第7部で使います。今回は入れるだけでOK）。
+`OK: 主要パッケージが使えます` と出れば成功です。
 
-```bash
-conda install -c conda-forge r-base -y
-```
+---
+
+## ステップ2.6　R を入れる（第7部で使用・今は入れるだけ）
+
+!!! info "R が既にある人はスキップ"
+    ステップ0で `R --version` が表示された人は、このステップは不要です。
+
+R は統計の回（第71回〜）で使います。今回は入れて動けばOKです。方法はどちらか1つ。
+
+=== "A. conda で入れる（conda環境の人に手軽）"
+
+    ```bash
+    conda install -c conda-forge r-base -y
+    ```
+
+=== "B. 公式インストーラで入れる（venvの人・R単体で使いたい人）"
+
+    - **Windows 11 / Ubuntu 共通**：[CRAN 公式サイト](https://cran.r-project.org/) からお使いのOS版をダウンロードしてインストール。
+    - Ubuntu はコマンドでも入ります：`sudo apt update && sudo apt install r-base -y`
+
+動作確認：ターミナルで `R --version` を打ち、`R version …` と出れば成功です。
 
 ---
 
@@ -117,6 +260,9 @@ VS Code を開き、左端の四角いアイコン（拡張機能）から次を
 ---
 
 ## ステップ4　Git を入れて名前を設定する
+
+!!! info "Git が既にある人は導入だけスキップ"
+    ステップ0で `git version …` が表示された人は、インストールは不要です。ただし**名前とメールの設定（下記）は一度だけ必要**なので、そこは行ってください。
 
 === "Windows 11"
 
@@ -197,12 +343,18 @@ print("matplotlib:", matplotlib.__version__)
 q()                  # R を終了（Save workspace? は n でOK）
 ```
 
+**問4.** パッケージ管理に慣れましょう。環境に入った状態（先頭が `(chem)` 等）で、次を試してください。
+
+1. `pip list` で今入っているパッケージ一覧を表示する。
+2. `pip show pandas` で pandas の詳細（バージョンなど）を表示する。
+3. `pip freeze > requirements.txt` で一覧をファイルに書き出し、中身を開いて確認する。
+
 ---
 
 ## 解答
 
 ??? success "問1 の解答・確認ポイント"
-    3つとも `x.y.z` の形でバージョンが表示されれば成功です。もし `ModuleNotFoundError` が出たら、`conda activate chem` を忘れていないか、ステップ2の `conda install` が終わっているかを確認してください。
+    3つとも `x.y.z` の形でバージョンが表示されれば成功です。もし `ModuleNotFoundError` が出たら、環境に入り忘れていないか（先頭が `(chem)` 等になっているか）、ステップ2.5 のパッケージ導入（conda install または pip install）が終わっているかを確認してください。
 
 ??? success "問2 の解答"
     ```python title="co2.py"
@@ -219,6 +371,14 @@ q()                  # R を終了（Save workspace? は n でOK）
 
 ??? success "問3 の解答・確認ポイント"
     `R` を起動して式を入力すると、`[1] 18.015` のように答えが表示されます。`[1]` は「結果の1個目」という R の印です。`q()` で終了できれば、R も無事に動いています。
+
+??? success "問4 の解答・確認ポイント"
+    - `pip list` … `numpy 2.x`、`pandas 2.x` のように「名前 バージョン」が縦に並びます。
+    - `pip show pandas` … `Name: pandas` / `Version: …` / `Location: …`（保存場所）などが表示されます。
+    - `pip freeze > requirements.txt` … 画面には何も出ませんが、同じフォルダに `requirements.txt` ができ、`pandas==2.2.0` のような形で一覧が入っています。このファイルがあれば、別のPCで `pip install -r requirements.txt` を実行するだけで同じ環境を再現できます。
+
+    !!! note "conda環境の人へ"
+        conda で入れたパッケージも `pip list` にはおおむね表示されます。ただし「環境まるごと」を厳密に再現したいときは、conda 側の `conda env export > environment.yml` の方が確実です（詳しくは第19回で扱います）。
 
 ---
 
