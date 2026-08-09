@@ -125,3 +125,19 @@ nav:
       - 第53回 箱ひげ図・バイオリン: lessons/lesson-53.md
       - 第54回 論文品質の図をつくる: lessons/lesson-54.md
       - 第55回 まとめ演習：反応速度の可視化: lessons/lesson-55.md
+  - 第6部　ケモインフォマティクス（RDKit）:
+      - 第56回 RDKit入門: lessons/lesson-56.md
+      - 第57回 SMILESで分子を表現する: lessons/lesson-57.md
+      - 第58回 分子を描画する: lessons/lesson-58.md
+      - 第59回 分子量・分子式・元素組成: lessons/lesson-59.md
+      - 第60回 分子記述子（LogP等）: lessons/lesson-60.md
+      - 第61回 部分構造検索: lessons/lesson-61.md
+      - 第62回 フィンガープリントと類似度: lessons/lesson-62.md
+      - 第63回 化合物ライブラリの一括処理: lessons/lesson-63.md
+      - 第64回 化学反応をSMARTSで表す: lessons/lesson-64.md
+      - 第65回 PubChemからデータ取得: lessons/lesson-65.md
+      - 第66回 分光データ（IR/NMR）の整理: lessons/lesson-66.md
+      - 第67回 クロマトグラフィー解析: lessons/lesson-67.md
+      - 第68回 周期表データ分析（mendeleev）: lessons/lesson-68.md
+      - 第69回 単位・物理定数（pint）: lessons/lesson-69.md
+      - 第70回 まとめ演習：医薬品分子の比較: lessons/lesson-70.md
