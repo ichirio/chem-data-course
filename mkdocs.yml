@@ -162,3 +162,20 @@ nav:
       - 第88回 Rでケモインフォ入門（rcdk）: lessons/lesson-88.md
       - 第89回 rcdkで分子記述子: lessons/lesson-89.md
       - 第90回 まとめ演習：Rで化合物統計解析: lessons/lesson-90.md
+  - 第8部　機械学習:
+      - 第91回 機械学習とは: lessons/lesson-91.md
+      - 第92回 scikit-learn入門: lessons/lesson-92.md
+      - 第93回 回帰で物性を予測する: lessons/lesson-93.md
+      - 第94回 分類モデル: lessons/lesson-94.md
+      - 第95回 訓練・テスト分割と過学習: lessons/lesson-95.md
+      - 第96回 モデル評価: lessons/lesson-96.md
+      - 第97回 特徴量エンジニアリング: lessons/lesson-97.md
+      - 第98回 次元削減（PCA）: lessons/lesson-98.md
+      - 第99回 クラスタリング: lessons/lesson-99.md
+      - 第100回 まとめ演習：QSAR: lessons/lesson-100.md
+  - 第9部　研究・実務に活かす:
+      - 第101回 Quartoでレポート（応用）: lessons/lesson-101.md
+      - 第102回 再現可能な研究: lessons/lesson-102.md
+      - 第103回 AIを研究の相棒にする: lessons/lesson-103.md
+      - 第104回 研究データ管理の基本: lessons/lesson-104.md
+      - 第105回 総合プロジェクト: lessons/lesson-105.md
