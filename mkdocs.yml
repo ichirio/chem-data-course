@@ -141,3 +141,24 @@ nav:
       - 第68回 周期表データ分析（mendeleev）: lessons/lesson-68.md
       - 第69回 単位・物理定数（pint）: lessons/lesson-69.md
       - 第70回 まとめ演習：医薬品分子の比較: lessons/lesson-70.md
+  - 第7部　R：統計とレポート、構造式:
+      - 第71回 Rをはじめる: lessons/lesson-71.md
+      - 第72回 Rの基本文法: lessons/lesson-72.md
+      - 第73回 tidyverse入門（dplyr）: lessons/lesson-73.md
+      - 第74回 dplyrで集計: lessons/lesson-74.md
+      - 第75回 tidyrでデータ整形（pivot）: lessons/lesson-75.md
+      - 第76回 ggplot2入門: lessons/lesson-76.md
+      - 第77回 記述統計と要約: lessons/lesson-77.md
+      - 第78回 正規分布と確率: lessons/lesson-78.md
+      - 第79回 仮説検定の考え方: lessons/lesson-79.md
+      - 第80回 t検定: lessons/lesson-80.md
+      - 第81回 分散分析（ANOVA）: lessons/lesson-81.md
+      - 第82回 カイ二乗検定: lessons/lesson-82.md
+      - 第83回 相関と回帰: lessons/lesson-83.md
+      - 第84回 重回帰分析: lessons/lesson-84.md
+      - 第85回 検量線と最小二乗法: lessons/lesson-85.md
+      - 第86回 Quartoで帳票・レポート: lessons/lesson-86.md
+      - 第87回 RとPythonの連携: lessons/lesson-87.md
+      - 第88回 Rでケモインフォ入門（rcdk）: lessons/lesson-88.md
+      - 第89回 rcdkで分子記述子: lessons/lesson-89.md
+      - 第90回 まとめ演習：Rで化合物統計解析: lessons/lesson-90.md
