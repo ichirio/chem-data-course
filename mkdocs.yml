@@ -179,3 +179,5 @@ nav:
       - 第103回 AIを研究の相棒にする: lessons/lesson-103.md
       - 第104回 研究データ管理の基本: lessons/lesson-104.md
       - 第105回 総合プロジェクト: lessons/lesson-105.md
+  - 発展コラム:
+      - Polars ── pandasと比べる: columns/polars.md
