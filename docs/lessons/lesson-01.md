@@ -289,6 +289,63 @@ VS Code を開き、左端の四角いアイコン（拡張機能）から次を
 
     エディタは共通のまま、AIだけ各自のサービスを差し込む——という形になります。契約がなくても、無料の範囲やWebのAIに質問しながら進められます。
 
+### `chem` 環境を選ぶ（VS Code で毎回ここを確認）
+
+VS Code は「どの Python を使うか」を自動では決めません。ステップ2で作った **`chem`** 環境を選んでおくと、▶ 実行もターミナルもすべて `chem` で動くようになります。
+
+作業用フォルダ（例：`chem-course`。無ければ作ってOK）を VS Code で開いた状態で、次を行います。
+
+1. コマンドパレットを開く：**Ctrl + Shift + P**（Mac は **⌘ + Shift + P**）
+2. `Python: Select Interpreter` と入力して選ぶ
+3. 一覧から **`chem`**（`…\miniforge3\envs\chem\python.exe` のようなパス）を選ぶ
+   （venv の人は `chem-env` を選びます）
+
+選ぶと画面下の青いバーに `Python 3.12.x ('chem')` のように表示されます。以降は——
+
+- 右上の **▶** で実行すると `chem` の Python が使われる
+- 新しくターミナルを開くと**自動で `chem` に入る**（先頭が `(chem)` になる）
+
+!!! tip "フォルダごとに記憶されます"
+    この選択は**開いているフォルダ（ワークスペース）ごと**に保存されます。毎回コマンドを打ち直す必要はありません。別のプロジェクトを開いたときだけ、そこで一度 Select Interpreter すればOKです。もし ▶ 実行時に `ModuleNotFoundError` が出たら、まずここが `chem` になっているかを疑いましょう。
+
+### 日本語が文字化けしないようにする（Windows向け）
+
+Windows は文字コードの既定が UTF-8 ではない（**cp932**＝Shift_JIS系）ため、Python が日本語を出力すると、ターミナルで次のように化けることがあります。
+
+```text
+縺薙ｓ縺ｫ縺｡縺ｯ
+豌ｴ (H2O) 縺ｮ蛻�蟄宣㍼縺ｯ 18.015 g/mol 縺ｧ縺�
+```
+
+本当は「こんにちは」「水 (H2O) の分子量は 18.015 g/mol です」と出したいのに、です。ときには `UnicodeEncodeError: 'cp932' codec can't encode …` というエラーで止まることもあります。
+
+これは **VS Code の設定で UTF-8 に統一**すれば解決します。
+
+1. コマンドパレット（**Ctrl + Shift + P**）→ `Preferences: Open Workspace Settings (JSON)` を選ぶ
+2. 開いた `.vscode/settings.json` に次を貼り付けて保存する
+
+```json title=".vscode/settings.json"
+{
+  // ファイルの読み書きを UTF-8 に固定
+  "files.encoding": "utf8",
+  "files.autoGuessEncoding": false,
+
+  // ターミナルで動く Python を UTF-8 モードにする（文字化け防止の要）
+  "terminal.integrated.env.windows": {
+    "PYTHONUTF8": "1",
+    "PYTHONIOENCODING": "utf-8"
+  }
+}
+```
+
+3. 設定を反映させるため、**ターミナルを開き直す**（ターミナル右上のゴミ箱アイコンで閉じて、新しく開く）か、VS Code を再起動します。
+
+!!! info "なぜこれで直るの？"
+    `PYTHONUTF8=1` は Python を **UTF-8モード**にするスイッチです。これで画面出力もファイルの読み書きも UTF-8 に統一され、Windows の cp932 との食い違いがなくなります。`files.encoding` はエディタが保存・読み込みに使う文字コードの指定で、こちらも UTF-8 にそろえています。
+
+!!! note "Mac / Ubuntu の人はほぼ不要"
+    Mac や Linux は最初から UTF-8 が既定なので、この文字化けは基本起きません。設定しておいても害はなく、その場合は `terminal.integrated.env.windows` を `terminal.integrated.env.osx`（Mac）／ `terminal.integrated.env.linux`（Linux）に読み替えれば同じ形にできます。
+
 ---
 
 ## ステップ4　Git を入れて名前を設定する
