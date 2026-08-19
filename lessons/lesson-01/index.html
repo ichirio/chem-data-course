@@ -1,0 +1,5088 @@
+
+<!doctype html>
+<html lang="ja" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="化学専攻の学生が、1回1テーマで初歩からPythonとRを学ぶ全100回コース">
+      
+      
+        <meta name="author" content="ichirio">
+      
+      
+        <link rel="canonical" href="https://ichirio.github.io/chem-data-course/lessons/lesson-01/">
+      
+      
+        <link rel="prev" href="../../roadmap/">
+      
+      
+        <link rel="next" href="../lesson-02/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>第1回 開発環境の構築 - 化学データ分析コース（Python主・R副）</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#1" class="md-skip">
+          コンテンツにスキップ
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="ヘッダー">
+    <a href="../.." title="化学データ分析コース（Python主・R副）" class="md-header__button md-logo" aria-label="化学データ分析コース（Python主・R副）" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            化学データ分析コース（Python主・R副）
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              第1回 開発環境の構築
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="ダークモードへ"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="ダークモードへ" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="ライトモードへ"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="ライトモードへ" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="検索" placeholder="検索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="検索">
+        
+        <button type="reset" class="md-search__icon md-icon" title="クリア" aria-label="クリア" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            検索を初期化
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ichirio/chem-data-course" title="リポジトリへ" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="ナビゲーション" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="化学データ分析コース（Python主・R副）" class="md-nav__button md-logo" aria-label="化学データ分析コース（Python主・R副）" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    化学データ分析コース（Python主・R副）
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ichirio/chem-data-course" title="リポジトリへ" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    はじめに
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ロードマップ（全100回）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第1部　はじめの一歩
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第1部　はじめの一歩
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第1回 開発環境の構築
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第1回 開発環境の構築
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        この回で入れるもの
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ0 すでに入っているか確認する（済みならスキップ）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-miniforge-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ1 Miniforge を入れる（＝ Python 本体が入る）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ステップ1 Miniforge を入れる（＝ Python 本体が入る）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        動作確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ2 学習用の環境をつくる
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25-conda-pip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ2.5 パッケージの入れ方（conda と pip）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ステップ2.5 パッケージの入れ方（conda と pip）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#miniforgeconda" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        今の主流と、このコースが Miniforge(conda) を選ぶ理由
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conda-pip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        conda と pip の使い分け
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        まず定番パッケージを入れる
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pip の基本コマンド（丸ごと覚える価値あり）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rdkit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        化学専用ライブラリ RDKit を入れる
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        動作確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#26-r-7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ2.6 R を入れる（第7部で使用・今は入れるだけ）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-vs-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ3 VS Code（エディタ）を入れる
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ステップ3 VS Code（エディタ）を入れる">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        拡張機能を入れる
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chem-vs-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        chem 環境を選ぶ（VS Code で毎回ここを確認）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        日本語が文字化けしないようにする（Windows向け）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-git" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ4 Git を入れて名前を設定する
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ5 はじめてのプログラムを動かす
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ステップ5 はじめてのプログラムを動かす">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        実行のしかた
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        演習問題
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        解答
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="解答">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        次回予告
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-02/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第2回 はじめてのPython
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-03/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第3回 リストと辞書で化学を扱う
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-04/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第4回 条件分岐（if）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-05/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第5回 繰り返し（for / while）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-06/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第6回 関数をつくる
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-07/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第7回 GitとGitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第8回 まとめ演習：分子量電卓
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第2部　Pythonの基礎
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第2部　Pythonの基礎
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-09/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第9回 文字列操作
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第10回 エラーと例外処理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-11/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第11回 モジュールとimport（math）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-12/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第12回 ファイルの読み書き
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-13/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第13回 内包表記
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第14回 ラムダと高階関数
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-15/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第15回 クラス入門
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第16回 Jupyter／セル実行
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-17/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第17回 読みやすいコード
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-18/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第18回 デバッグの基礎
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-19/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第19回 仮想環境とパッケージ管理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-20/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第20回 まとめ演習：データ整理ツール
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第3部　数値計算とNumPy
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第3部　数値計算とNumPy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-21/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第21回 NumPy入門
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-22/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第22回 配列の生成と操作
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-23/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第23回 ベクトルと行列の演算
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-24/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第24回 ブロードキャスト
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-25/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第25回 統計量をNumPyで
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-26/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第26回 乱数とシミュレーション
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-27/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第27回 単位換算
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-28/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第28回 濃度計算を配列で
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第29回 数値誤差と有効数字
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-30/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第30回 まとめ演習：滴定曲線
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第4部　データ処理とpandas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第4部　データ処理とpandas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-31/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第31回 pandas入門・DataFrame
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-32/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第32回 CSVを読み込む・書き出す
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-33/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第33回 行と列の選択（loc / iloc）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-34/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第34回 フィルタリングと条件抽出
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-35/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第35回 欠損値の扱い
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-36/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第36回 並べ替えと集計（groupby）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-37/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第37回 列の追加・計算・変換
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-38/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第38回 複数データの結合（merge / concat）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-39/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第39回 ピボットテーブルとクロス集計
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-40/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第40回 日付・時刻データの扱い
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-41/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第41回 実験データの前処理レシピ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-42/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第42回 外れ値の検出
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-43/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第43回 正規化・標準化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-44/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第44回 Excelの読み書き
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-45/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第45回 まとめ演習：実験ノート分析
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第5部　データ可視化
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第5部　データ可視化
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-46/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第46回 matplotlib入門
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-47/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第47回 折れ線・散布図・棒グラフ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-48/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第48回 ヒストグラムと分布
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-49/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第49回 複数グラフとサブプロット
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-50/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第50回 グラフの装飾
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-51/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第51回 seabornで統計グラフ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-52/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第52回 相関のヒートマップ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-53/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第53回 箱ひげ図・バイオリン
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-54/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第54回 論文品質の図をつくる
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-55/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第55回 まとめ演習：反応速度の可視化
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第6部　ケモインフォマティクス（RDKit）
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第6部　ケモインフォマティクス（RDKit）
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-56/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第56回 RDKit入門
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-57/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第57回 SMILESで分子を表現する
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-58/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第58回 分子を描画する
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-59/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第59回 分子量・分子式・元素組成
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-60/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第60回 分子記述子（LogP等）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-61/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第61回 部分構造検索
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-62/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第62回 フィンガープリントと類似度
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-63/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第63回 化合物ライブラリの一括処理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-64/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第64回 化学反応をSMARTSで表す
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-65/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第65回 PubChemからデータ取得
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-66/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第66回 分光データ（IR/NMR）の整理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-67/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第67回 クロマトグラフィー解析
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-68/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第68回 周期表データ分析（mendeleev）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-69/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第69回 単位・物理定数（pint）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-70/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第70回 まとめ演習：医薬品分子の比較
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第7部　R：統計とレポート、構造式
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第7部　R：統計とレポート、構造式
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-71/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第71回 Rをはじめる
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-72/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第72回 Rの基本文法
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-73/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第73回 tidyverse入門（dplyr）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-74/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第74回 dplyrで集計
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-75/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第75回 tidyrでデータ整形（pivot）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-76/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第76回 ggplot2入門
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-77/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第77回 記述統計と要約
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-78/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第78回 正規分布と確率
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-79/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第79回 仮説検定の考え方
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-80/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第80回 t検定
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-81/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第81回 分散分析（ANOVA）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-82/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第82回 カイ二乗検定
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-83/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第83回 相関と回帰
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-84/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第84回 重回帰分析
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-85/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第85回 検量線と最小二乗法
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第86回 Quartoで帳票・レポート
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-87/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第87回 RとPythonの連携
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-88/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第88回 Rでケモインフォ入門（rcdk）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-89/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第89回 rcdkで分子記述子
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-90/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第90回 まとめ演習：Rで化合物統計解析
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第8部　機械学習
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第8部　機械学習
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-91/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第91回 機械学習とは
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-92/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第92回 scikit-learn入門
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-93/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第93回 回帰で物性を予測する
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-94/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第94回 分類モデル
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-95/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第95回 訓練・テスト分割と過学習
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-96/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第96回 モデル評価
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-97/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第97回 特徴量エンジニアリング
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-98/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第98回 次元削減（PCA）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-99/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第99回 クラスタリング
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-100/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第100回 まとめ演習：QSAR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第9部　研究・実務に活かす
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第9部　研究・実務に活かす
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-101/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第101回 Quartoでレポート（応用）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-102/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第102回 再現可能な研究
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-103/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第103回 AIを研究の相棒にする
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-104/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第104回 研究データ管理の基本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lesson-105/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第105回 総合プロジェクト
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_12" id="__nav_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    発展コラム
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    発展コラム
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../columns/polars/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Polars ── pandasと比べる
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        この回で入れるもの
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ0 すでに入っているか確認する（済みならスキップ）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-miniforge-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ1 Miniforge を入れる（＝ Python 本体が入る）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ステップ1 Miniforge を入れる（＝ Python 本体が入る）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        動作確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ2 学習用の環境をつくる
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25-conda-pip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ2.5 パッケージの入れ方（conda と pip）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ステップ2.5 パッケージの入れ方（conda と pip）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#miniforgeconda" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        今の主流と、このコースが Miniforge(conda) を選ぶ理由
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conda-pip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        conda と pip の使い分け
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        まず定番パッケージを入れる
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pip の基本コマンド（丸ごと覚える価値あり）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rdkit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        化学専用ライブラリ RDKit を入れる
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        動作確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#26-r-7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ2.6 R を入れる（第7部で使用・今は入れるだけ）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-vs-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ3 VS Code（エディタ）を入れる
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ステップ3 VS Code（エディタ）を入れる">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        拡張機能を入れる
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chem-vs-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        chem 環境を選ぶ（VS Code で毎回ここを確認）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        日本語が文字化けしないようにする（Windows向け）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-git" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ4 Git を入れて名前を設定する
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ステップ5 はじめてのプログラムを動かす
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ステップ5 はじめてのプログラムを動かす">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        実行のしかた
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        演習問題
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        解答
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="解答">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        次回予告
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="1">第1回　開発環境の構築<a class="headerlink" href="#1" title="Permanent link">&para;</a></h1>
+<div class="admonition abstract">
+<p class="admonition-title">この回のゴール</p>
+<ul>
+<li>自分のパソコン（Ubuntu または Windows 11）に、学習に必要な道具をそろえる</li>
+<li>Python が動くことを確認する</li>
+<li>コードエディタ（VS Code）と、AIの相棒、Git を使えるようにする</li>
+<li>所要時間の目安: 60〜90分（最初だけ少し長めです。1回で終わらなくても大丈夫）</li>
+</ul>
+</div>
+<h2 id="_1">この回で入れるもの<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>道具</th>
+<th>役割</th>
+<th>なぜこれ？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Miniforge</strong></td>
+<td>Python本体と科学ライブラリの管理</td>
+<td>化学で使う RDKit などを、無料でトラブルなく入れられる</td>
+</tr>
+<tr>
+<td><strong>VS Code</strong></td>
+<td>コードを書くエディタ</td>
+<td>無料・定番・AI拡張が最も充実</td>
+</tr>
+<tr>
+<td><strong>Git</strong></td>
+<td>変更履歴の管理・共有</td>
+<td>研究の再現性とポートフォリオの土台</td>
+</tr>
+<tr>
+<td><strong>R</strong>（任意・後半で本格利用）</td>
+<td>統計</td>
+<td>統計の回で使います。今回は入れるだけ</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">なぜ Anaconda ではなく Miniforge？</p>
+<p>Miniforge は Anaconda と同じ「conda」の仕組みを使いますが、<strong>完全無料で利用条件の制約がなく</strong>、化学ライブラリの入手元（conda-forge）が最初から設定されています。軽くて安心です。</p>
+</div>
+<hr />
+<h2 id="0">ステップ0　すでに入っているか確認する（済みならスキップ）<a class="headerlink" href="#0" title="Permanent link">&para;</a></h2>
+<p>インストールを始める前に、<strong>もう入っているものは飛ばして構いません</strong>。ターミナル（Windows は「Miniforge Prompt」か「PowerShell」、Ubuntu は端末）で次を打って確認します。</p>
+<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>--version<span class="w">     </span><span class="c1"># 例: Python 3.12.3  → 出れば Python は導入済み</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>conda<span class="w"> </span>--version<span class="w">      </span><span class="c1"># 例: conda 24.x     → 出れば Miniforge/conda 導入済み</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>R<span class="w"> </span>--version<span class="w">          </span><span class="c1"># 先頭に R version … → 出れば R は導入済み</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>git<span class="w"> </span>--version<span class="w">        </span><span class="c1"># 例: git version 2.x → 出れば Git は導入済み</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>code<span class="w"> </span>--version<span class="w">       </span><span class="c1"># 数字が出れば VS Code 導入済み</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>表示された</th>
+<th>出なかった（<code>command not found</code> 等）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>そのツールのインストールは<strong>スキップ</strong>してOK</td>
+<td>該当ステップに従って入れる</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">「Python は入っているが conda は入っていない」場合</p>
+<p>パソコンにすでに Python があっても、<strong>このコースでは <code>chem</code> という専用環境を1つ作って学ぶ</strong>ことをおすすめします（他の作業と混ざらず、化学ライブラリの導入も安定するため）。
+その方法は2通りあります。どちらか片方でOKです。</p>
+<ul>
+<li><strong>A. Miniforge/conda を使う（推奨）</strong>… 化学ライブラリ（RDKit 等）が一番安定。ステップ1へ。</li>
+<li><strong>B. すでにある Python の <code>venv</code> を使う（conda を増やしたくない人向け）</strong>… ステップ2の「venv 版」を参照。</li>
+</ul>
+</div>
+<hr />
+<h2 id="1-miniforge-python">ステップ1　Miniforge を入れる（＝ Python 本体が入る）<a class="headerlink" href="#1-miniforge-python" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">conda が既にある人はスキップ</p>
+<p>ステップ0で <code>conda --version</code> が表示された人は、このステップは不要です。ステップ2へ進んでください。</p>
+</div>
+<p>Miniforge を入れると、<strong>Python 本体も一緒に入ります</strong>（別途 Python を入れる必要はありません）。</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Windows 11</label><label for="__tabbed_1_2">Ubuntu</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ol>
+<li>ブラウザで <a href="https://github.com/conda-forge/miniforge/releases/latest">Miniforge の配布ページ</a> を開く。</li>
+<li><code>Miniforge3-Windows-x86_64.exe</code> をダウンロードして実行する。</li>
+<li>インストーラでは基本そのまま「Next」で進めてOK（インストール先は初期値のままで問題ありません）。</li>
+<li>完了したら、スタートメニューから <strong>「Miniforge Prompt」</strong> を開く。以降のコマンドはこの黒い画面（ターミナル）に入力します。</li>
+</ol>
+</div>
+<div class="tabbed-block">
+<p>ターミナル（<code>Ctrl</code>+<code>Alt</code>+<code>T</code>）を開いて、次を順に実行します。</p>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># インストーラをダウンロード</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>wget<span class="w"> </span><span class="s2">"https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh"</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># 実行（画面の指示に従い、最後の「初期化しますか？」は yes）</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>bash<span class="w"> </span>Miniforge3-Linux-x86_64.sh
+</span></code></pre></div>
+<p>終わったらターミナルを一度閉じて開き直します。行の先頭に <code>(base)</code> と表示されれば成功です。</p>
+</div>
+</div>
+</div>
+<h3 id="_2">動作確認<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>ターミナル（Miniforge Prompt / Ubuntu のターミナル）で次を実行します。</p>
+<div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>conda<span class="w"> </span>--version
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>python<span class="w"> </span>--version
+</span></code></pre></div>
+<p><code>conda 24.x</code> や <code>Python 3.12.x</code> のようにバージョンが表示されれば成功です。</p>
+<hr />
+<h2 id="2">ステップ2　学習用の環境をつくる<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<p>パソコンには色々な作業が混ざります。<strong>プロジェクト専用の「環境」を1つ作って隔離</strong>しておくと、後でトラブりません。<code>chem</code> という名前の環境を作ります。方法は2通り、<strong>どちらか片方でOK</strong>です。</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">A. conda で作る（推奨）</label><label for="__tabbed_2_2">B. venv で作る（すでにPythonがあり、condaを増やしたくない人）</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>化学ライブラリ（RDKit 等）が一番安定します。迷ったらこちら。</p>
+<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># chem という名前の環境を作る（Python 3.12 を指定）</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>chem<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12<span class="w"> </span>-y
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># 作った環境に「入る」（これ以降、行の先頭が (chem) になる）</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>conda<span class="w"> </span>activate<span class="w"> </span>chem
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<p>OSに入っている Python をそのまま使い、標準機能の <code>venv</code> で環境を分けます。</p>
+<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># 好きな作業フォルダの中で実行（例：chem-course フォルダ）</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>chem-env<span class="w">          </span><span class="c1"># chem-env という環境フォルダを作る</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># 環境に「入る」</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="c1"># Windows (PowerShell):</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>chem-env<span class="se">\S</span>cripts<span class="se">\A</span>ctivate.ps1
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Ubuntu / macOS:</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nb">source</span><span class="w"> </span>chem-env/bin/activate
+</span></code></pre></div>
+<p>入ると行の先頭に <code>(chem-env)</code> と表示されます。</p>
+</div>
+</div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">毎回のはじめに（超重要）</p>
+<p>作業を始めるたびに、環境に「入る」操作が必要です。
+先頭が <code>(chem)</code>（またはvenvなら <code>(chem-env)</code>）になっているか、毎回確認してください。
+なっていなければ conda は <code>conda activate chem</code>、venv は上の activate コマンドを実行します。</p>
+</div>
+<hr />
+<h2 id="25-conda-pip">ステップ2.5　パッケージの入れ方（conda と pip）<a class="headerlink" href="#25-conda-pip" title="Permanent link">&para;</a></h2>
+<p>Python の便利な機能は「パッケージ（ライブラリ）」として配られています。それを入れる道具が <strong>conda</strong> と <strong>pip</strong> の2つです。ここは一生使う知識なので、基本だけ押さえましょう。</p>
+<h3 id="miniforgeconda">今の主流と、このコースが Miniforge(conda) を選ぶ理由<a class="headerlink" href="#miniforgeconda" title="Permanent link">&para;</a></h3>
+<div class="admonition question">
+<p class="admonition-title">pip と conda、どっちが正解？</p>
+<p>結論から言うと「<strong>分野で棲み分け</strong>」です。どちらが勝ち、ではありません。</p>
+<ul>
+<li><strong>一般のPython開発</strong>（Webやアプリ、自動化）… <strong>pip＋venv が世界の基盤</strong>。近年は高速な <strong>uv</strong> が新しい定番になりつつあります。</li>
+<li><strong>化学・科学計算</strong> … <strong>conda が依然として標準</strong>。このコースはこちら側です。</li>
+</ul>
+<p>なぜ化学では conda かというと、両者の"世界観"が違うからです。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>pip の世界観</th>
+<th>conda の世界観</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>配るもの</td>
+<td><strong>Pythonのパッケージ</strong>だけ</td>
+<td>Python も <strong>R も、C/C++ライブラリも</strong>、環境ごと</td>
+</tr>
+<tr>
+<td>得意</td>
+<td>Python完結のもの</td>
+<td><strong>複数言語・コンパイル済み科学ソフトが混ざる分野</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>このコースが Miniforge(conda) を主軸にする理由は3つです。</strong></p>
+<ol>
+<li>
+<p><strong>化学に特化した道具が壊れずに入るから。</strong>
+   化学では RDKit・OpenBabel・量子化学ソフトなど「Pythonの外側（C/C++）」に依存する道具が多く、pip だと環境によってビルドに失敗しがちでした。conda-forge は<strong>ビルド済み</strong>で配るので「入れたら動く」。初心者が環境で挫折しないための、いちばん確実な道です。</p>
+</li>
+<li>
+<p><strong>このコースは Python と R の両方を使うから。</strong>
+   これが決定打です。<strong>Python も R 本体も、1つの環境でまとめて管理できるのは conda だけ</strong>。統計の回（第71回〜）で R に切り替えても、同じ仕組みで扱えます。pip は R を管理できません。</p>
+</li>
+<li>
+<p><strong>初心者が道具を1本に絞れるから。</strong>
+   覚えることを減らし、トラブルを減らす。学習に集中できます。</p>
+</li>
+</ol>
+<div class="admonition tip">
+<p class="admonition-title">でも pip も必ず覚えます（土台スキル）</p>
+<p>conda を主軸にしても、<strong>pip は全プログラマー必須の土台</strong>です。conda に無いパッケージは pip で入れますし、将来どんな現場でも使います。だから下で pip の使い方もしっかり扱います。
+さらに速さを求めるなら <strong>uv</strong>（Rust製の高速な pip 互換ツール）という現代的な選択肢もあります。まずは pip に慣れ、慣れたら uv に触れてみる——という順番がおすすめです（深掘りは第19回）。</p>
+</div>
+<h3 id="conda-pip">conda と pip の使い分け<a class="headerlink" href="#conda-pip" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>conda</th>
+<th>pip</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>入手元</td>
+<td>conda-forge など</td>
+<td>PyPI（Pythonの公式倉庫）</td>
+</tr>
+<tr>
+<td>得意</td>
+<td>科学・化学系（<strong>RDKit</strong>, NumPy など、内部でC/C++を使う重いもの）</td>
+<td>Python製の軽いパッケージ全般。<strong>世界標準</strong></td>
+</tr>
+<tr>
+<td>使える環境</td>
+<td>conda環境のみ</td>
+<td>conda環境でも venv でも使える</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">かんたんな方針</p>
+<ul>
+<li><strong>conda環境（方法A）を使う人</strong>：化学・科学系は <strong>conda</strong> で、conda に無いものだけ <strong>pip</strong> で。</li>
+<li><strong>venv（方法B）を使う人</strong>：すべて <strong>pip</strong> で入れます（venvにcondaは使えません）。</li>
+<li>どちらでも、<strong>pip はほぼ必ず使う</strong>ので、pip の使い方は覚えておきましょう。</li>
+</ul>
+</div>
+<h3 id="_3">まず定番パッケージを入れる<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">conda環境の人</label><label for="__tabbed_3_2">venvの人</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># 科学・化学系は conda-forge から（安定）</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>numpy<span class="w"> </span>pandas<span class="w"> </span>matplotlib<span class="w"> </span>seaborn<span class="w"> </span>scikit-learn<span class="w"> </span>jupyter<span class="w"> </span>-y
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># すべて pip で</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>pip<span class="w"> </span>install<span class="w"> </span>numpy<span class="w"> </span>pandas<span class="w"> </span>matplotlib<span class="w"> </span>seaborn<span class="w"> </span>scikit-learn<span class="w"> </span>jupyter
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="pip">pip の基本コマンド（丸ごと覚える価値あり）<a class="headerlink" href="#pip" title="Permanent link">&para;</a></h3>
+<p>環境に入った状態（先頭が <code>(chem)</code> 等）で使います。</p>
+<div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pip<span class="w"> </span>install<span class="w"> </span>pandas<span class="w">              </span><span class="c1"># 入れる</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"pandas==2.2.0"</span><span class="w">     </span><span class="c1"># バージョンを指定して入れる</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pandas<span class="w">    </span><span class="c1"># 最新に更新する</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>pip<span class="w"> </span>uninstall<span class="w"> </span>pandas<span class="w">            </span><span class="c1"># 消す</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>pip<span class="w"> </span>list<span class="w">                        </span><span class="c1"># 今入っているもの一覧</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>pip<span class="w"> </span>show<span class="w"> </span>pandas<span class="w">                 </span><span class="c1"># 詳細（バージョン・保存場所など）</span>
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">requirements.txt で「まとめて再現」</p>
+<p>使ったパッケージを一覧ファイルに書き出しておくと、別のPCでも一発で同じ環境を再現できます。研究の再現性にも直結する大事な習慣です。
+<div class="highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pip<span class="w"> </span>freeze<span class="w"> </span>&gt;<span class="w"> </span>requirements.txt<span class="w">      </span><span class="c1"># 今の環境を書き出す</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt<span class="w">    </span><span class="c1"># 別のPCでまとめて入れる</span>
+</span></code></pre></div></p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">conda環境で pip を使うときの注意</p>
+<p>conda環境の中で pip も使えますが、<strong>同じパッケージを conda と pip の両方で入れない</strong>でください（競合の原因）。
+「基本は conda、conda に無いものだけ pip」と役割を分ければ安全です。</p>
+</div>
+<h3 id="rdkit">化学専用ライブラリ RDKit を入れる<a class="headerlink" href="#rdkit" title="Permanent link">&para;</a></h3>
+<p>第6部（ケモインフォマティクス）で使う <strong>RDKit</strong> も入れておきましょう。</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">conda環境の人（推奨）</label><label for="__tabbed_4_2">venvの人</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>rdkit<span class="w"> </span>-y
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>pip<span class="w"> </span>install<span class="w"> </span>rdkit
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="_4">動作確認<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import numpy, pandas, matplotlib, rdkit; print('OK: 主要パッケージが使えます')"</span>
+</span></code></pre></div>
+<p><code>OK: 主要パッケージが使えます</code> と出れば成功です。</p>
+<hr />
+<h2 id="26-r-7">ステップ2.6　R を入れる（第7部で使用・今は入れるだけ）<a class="headerlink" href="#26-r-7" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">R が既にある人はスキップ</p>
+<p>ステップ0で <code>R --version</code> が表示された人は、このステップは不要です。</p>
+</div>
+<p>R は統計の回（第71回〜）で使います。今回は入れて動けばOKです。方法はどちらか1つ。</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">A. conda で入れる（conda環境の人に手軽）</label><label for="__tabbed_5_2">B. 公式インストーラで入れる（venvの人・R単体で使いたい人）</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>r-base<span class="w"> </span>-y
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<ul>
+<li><strong>Windows 11 / Ubuntu 共通</strong>：<a href="https://cran.r-project.org/">CRAN 公式サイト</a> からお使いのOS版をダウンロードしてインストール。</li>
+<li>Ubuntu はコマンドでも入ります：<code>sudo apt update &amp;&amp; sudo apt install r-base -y</code></li>
+</ul>
+</div>
+</div>
+</div>
+<p>動作確認：ターミナルで <code>R --version</code> を打ち、<code>R version …</code> と出れば成功です。</p>
+<hr />
+<h2 id="3-vs-code">ステップ3　VS Code（エディタ）を入れる<a class="headerlink" href="#3-vs-code" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Windows 11</label><label for="__tabbed_6_2">Ubuntu</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><a href="https://code.visualstudio.com/">VS Code 公式サイト</a> から Windows 版をダウンロードしてインストールします。
+（インストール時「PATH への追加」にチェックが入っていればそのままでOK）</p>
+</div>
+<div class="tabbed-block">
+<p><div class="highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>sudo<span class="w"> </span>snap<span class="w"> </span>install<span class="w"> </span>code<span class="w"> </span>--classic
+</span></code></pre></div>
+うまくいかない場合は <a href="https://code.visualstudio.com/">公式サイト</a> から <code>.deb</code> を入れてください。</p>
+</div>
+</div>
+</div>
+<h3 id="_5">拡張機能を入れる<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p>VS Code を開き、左端の四角いアイコン（拡張機能）から次を検索してインストールします。</p>
+<ul>
+<li><strong>Python</strong>（Microsoft製）… Python を書く・実行する基本</li>
+<li><strong>Jupyter</strong>（Microsoft製）… セル単位で対話的に実行する</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">AIの相棒を入れる（任意）</p>
+<p>使っているAIサービスに合わせて、VS Code に補助ツールを追加できます。</p>
+<ul>
+<li><strong>ChatGPT を使う場合</strong>: 拡張機能で <strong>「Codex」</strong>（OpenAI製）を入れ、ChatGPTアカウントでサインイン。</li>
+<li><strong>Claude を使う場合</strong>: <strong>Claude Code</strong> を使う（VS Code拡張、またはターミナルでCLI）。</li>
+</ul>
+<p>エディタは共通のまま、AIだけ各自のサービスを差し込む——という形になります。契約がなくても、無料の範囲やWebのAIに質問しながら進められます。</p>
+</div>
+<h3 id="chem-vs-code"><code>chem</code> 環境を選ぶ（VS Code で毎回ここを確認）<a class="headerlink" href="#chem-vs-code" title="Permanent link">&para;</a></h3>
+<p>VS Code は「どの Python を使うか」を自動では決めません。ステップ2で作った <strong><code>chem</code></strong> 環境を選んでおくと、▶ 実行もターミナルもすべて <code>chem</code> で動くようになります。</p>
+<p>作業用フォルダ（例：<code>chem-course</code>。無ければ作ってOK）を VS Code で開いた状態で、次を行います。</p>
+<ol>
+<li>コマンドパレットを開く：<strong>Ctrl + Shift + P</strong>（Mac は <strong>⌘ + Shift + P</strong>）</li>
+<li><code>Python: Select Interpreter</code> と入力して選ぶ</li>
+<li>一覧から <strong><code>chem</code></strong>（<code>…\miniforge3\envs\chem\python.exe</code> のようなパス）を選ぶ
+   （venv の人は <code>chem-env</code> を選びます）</li>
+</ol>
+<p>選ぶと画面下の青いバーに <code>Python 3.12.x ('chem')</code> のように表示されます。以降は——</p>
+<ul>
+<li>右上の <strong>▶</strong> で実行すると <code>chem</code> の Python が使われる</li>
+<li>新しくターミナルを開くと<strong>自動で <code>chem</code> に入る</strong>（先頭が <code>(chem)</code> になる）</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">フォルダごとに記憶されます</p>
+<p>この選択は<strong>開いているフォルダ（ワークスペース）ごと</strong>に保存されます。毎回コマンドを打ち直す必要はありません。別のプロジェクトを開いたときだけ、そこで一度 Select Interpreter すればOKです。もし ▶ 実行時に <code>ModuleNotFoundError</code> が出たら、まずここが <code>chem</code> になっているかを疑いましょう。</p>
+</div>
+<h3 id="windows">日本語が文字化けしないようにする（Windows向け）<a class="headerlink" href="#windows" title="Permanent link">&para;</a></h3>
+<p>Windows は文字コードの既定が UTF-8 ではない（<strong>cp932</strong>＝Shift_JIS系）ため、Python が日本語を出力すると、ターミナルで次のように化けることがあります。</p>
+<div class="highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>縺薙ｓ縺ｫ縺｡縺ｯ
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>豌ｴ (H2O) 縺ｮ蛻�蟄宣㍼縺ｯ 18.015 g/mol 縺ｧ縺�
+</span></code></pre></div>
+<p>本当は「こんにちは」「水 (H2O) の分子量は 18.015 g/mol です」と出したいのに、です。ときには <code>UnicodeEncodeError: 'cp932' codec can't encode …</code> というエラーで止まることもあります。</p>
+<p>これは <strong>VS Code の設定で UTF-8 に統一</strong>すれば解決します。</p>
+<ol>
+<li>コマンドパレット（<strong>Ctrl + Shift + P</strong>）→ <code>Preferences: Open Workspace Settings (JSON)</code> を選ぶ</li>
+<li>開いた <code>.vscode/settings.json</code> に次を貼り付けて保存する</li>
+</ol>
+<div class="highlight"><span class="filename">.vscode/settings.json</span><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">{</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="c1">// ファイルの読み書きを UTF-8 に固定</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nt">"files.encoding"</span><span class="p">:</span><span class="w"> </span><span class="s2">"utf8"</span><span class="p">,</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="nt">"files.autoGuessEncoding"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">  </span><span class="c1">// ターミナルで動く Python を UTF-8 モードにする（文字化け防止の要）</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">  </span><span class="nt">"terminal.integrated.env.windows"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">    </span><span class="nt">"PYTHONUTF8"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">    </span><span class="nt">"PYTHONIOENCODING"</span><span class="p">:</span><span class="w"> </span><span class="s2">"utf-8"</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="p">}</span>
+</span></code></pre></div>
+<ol>
+<li>設定を反映させるため、<strong>ターミナルを開き直す</strong>（ターミナル右上のゴミ箱アイコンで閉じて、新しく開く）か、VS Code を再起動します。</li>
+</ol>
+<div class="admonition info">
+<p class="admonition-title">なぜこれで直るの？</p>
+<p><code>PYTHONUTF8=1</code> は Python を <strong>UTF-8モード</strong>にするスイッチです。これで画面出力もファイルの読み書きも UTF-8 に統一され、Windows の cp932 との食い違いがなくなります。<code>files.encoding</code> はエディタが保存・読み込みに使う文字コードの指定で、こちらも UTF-8 にそろえています。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Mac / Ubuntu の人はほぼ不要</p>
+<p>Mac や Linux は最初から UTF-8 が既定なので、この文字化けは基本起きません。設定しておいても害はなく、その場合は <code>terminal.integrated.env.windows</code> を <code>terminal.integrated.env.osx</code>（Mac）／ <code>terminal.integrated.env.linux</code>（Linux）に読み替えれば同じ形にできます。</p>
+</div>
+<hr />
+<h2 id="4-git">ステップ4　Git を入れて名前を設定する<a class="headerlink" href="#4-git" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">Git が既にある人は導入だけスキップ</p>
+<p>ステップ0で <code>git version …</code> が表示された人は、インストールは不要です。ただし<strong>名前とメールの設定（下記）は一度だけ必要</strong>なので、そこは行ってください。</p>
+</div>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">Windows 11</label><label for="__tabbed_7_2">Ubuntu</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><a href="https://git-scm.com/download/win">Git for Windows</a> をダウンロードしてインストール（設定はすべて初期値でOK）。</p>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>git<span class="w"> </span>-y
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<p>インストール後、自分の名前とメールを一度だけ設定します（コミットの署名に使われます）。</p>
+<div class="highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.name<span class="w"> </span><span class="s2">"あなたの名前"</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.email<span class="w"> </span><span class="s2">"you@example.com"</span>
+</span></code></pre></div>
+<hr />
+<h2 id="5">ステップ5　はじめてのプログラムを動かす<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
+<p>いよいよ動作確認です。デスクトップなどに <code>chem-course</code> フォルダを作り、VS Code で開きます。
+その中に <code>hello_chem.py</code> というファイルを新規作成し、次を<strong>そのままコピペ</strong>してください。</p>
+<div class="highlight"><span class="filename">hello_chem.py</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># 水 H2O の分子量を計算してみる</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">atomic_mass</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"H"</span><span class="p">:</span> <span class="mf">1.008</span><span class="p">,</span> <span class="s2">"O"</span><span class="p">:</span> <span class="mf">15.999</span><span class="p">}</span>   <span class="c1"># 原子量（g/mol）</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="n">water</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">atomic_mass</span><span class="p">[</span><span class="s2">"H"</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">atomic_mass</span><span class="p">[</span><span class="s2">"O"</span><span class="p">]</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"はじめまして、化学データ分析の世界へ！"</span><span class="p">)</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"水 (H2O) の分子量は </span><span class="si">{</span><span class="n">water</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> g/mol です"</span><span class="p">)</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="c1"># いま使っている Python のバージョンも確認</span>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Python:"</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+</span></code></pre></div>
+<h3 id="_6">実行のしかた<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li>VS Code の右上にある <strong>▶（実行）ボタン</strong>を押す、または</li>
+<li>ターミナルで次を実行します（<code>(chem)</code> になっていることを確認）。</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>python<span class="w"> </span>hello_chem.py
+</span></code></pre></div>
+<p>次のような出力が出れば大成功です。</p>
+<div class="highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>はじめまして、化学データ分析の世界へ！
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>水 (H2O) の分子量は 18.015 g/mol です
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>Python: 3.12.x
+</span></code></pre></div>
+<div class="admonition success">
+<p class="admonition-title">ここまでできたら</p>
+<p>環境構築は完了です。おめでとうございます！ ここが一番の山場でした。次回からは実際にプログラムを書いていきます。</p>
+</div>
+<hr />
+<h2 id="_7">演習問題<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<p><strong>問1.</strong> ライブラリがちゃんと入ったか確認しましょう。次のコードを <code>check.py</code> として実行し、エラーが出ないこと・バージョンが表示されることを確かめてください。</p>
+<div class="highlight"><span class="filename">check.py</span><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="o">,</span><span class="w"> </span><span class="nn">pandas</span><span class="o">,</span><span class="w"> </span><span class="nn">matplotlib</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"numpy:"</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"pandas:"</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"matplotlib:"</span><span class="p">,</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</span></code></pre></div>
+<p><strong>問2.</strong> <code>hello_chem.py</code> をまねて、<strong>二酸化炭素 CO₂ の分子量</strong>を計算して表示するプログラムを書いてください。炭素 C の原子量は 12.011、酸素 O は 15.999 とします。</p>
+<p><strong>問3.</strong>（余力があれば）R も動くか確認しましょう。ターミナルで <code>R</code> と打つと R が起動します。次を入力してみてください。</p>
+<div class="highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="m">1.008</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">15.999</span><span class="w">   </span><span class="c1"># 水の分子量を R で計算</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="nf">q</span><span class="p">()</span><span class="w">                  </span><span class="c1"># R を終了（Save workspace? は n でOK）</span>
+</span></code></pre></div>
+<p><strong>問4.</strong> パッケージ管理に慣れましょう。環境に入った状態（先頭が <code>(chem)</code> 等）で、次を試してください。</p>
+<ol>
+<li><code>pip list</code> で今入っているパッケージ一覧を表示する。</li>
+<li><code>pip show pandas</code> で pandas の詳細（バージョンなど）を表示する。</li>
+<li><code>pip freeze &gt; requirements.txt</code> で一覧をファイルに書き出し、中身を開いて確認する。</li>
+</ol>
+<hr />
+<h2 id="_8">解答<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<details class="success">
+<summary>問1 の解答・確認ポイント</summary>
+<p>3つとも <code>x.y.z</code> の形でバージョンが表示されれば成功です。もし <code>ModuleNotFoundError</code> が出たら、環境に入り忘れていないか（先頭が <code>(chem)</code> 等になっているか）、ステップ2.5 のパッケージ導入（conda install または pip install）が終わっているかを確認してください。</p>
+</details>
+<details class="success">
+<summary>問2 の解答</summary>
+<div class="highlight"><span class="filename">co2.py</span><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># 二酸化炭素 CO2 の分子量</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="n">atomic_mass</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"C"</span><span class="p">:</span> <span class="mf">12.011</span><span class="p">,</span> <span class="s2">"O"</span><span class="p">:</span> <span class="mf">15.999</span><span class="p">}</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="n">co2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">atomic_mass</span><span class="p">[</span><span class="s2">"C"</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">atomic_mass</span><span class="p">[</span><span class="s2">"O"</span><span class="p">]</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"二酸化炭素 (CO2) の分子量は </span><span class="si">{</span><span class="n">co2</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> g/mol です"</span><span class="p">)</span>
+</span></code></pre></div>
+<p>出力:
+<div class="highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>二酸化炭素 (CO2) の分子量は 44.009 g/mol です
+</span></code></pre></div></p>
+</details>
+<details class="success">
+<summary>問3 の解答・確認ポイント</summary>
+<p><code>R</code> を起動して式を入力すると、<code>[1] 18.015</code> のように答えが表示されます。<code>[1]</code> は「結果の1個目」という R の印です。<code>q()</code> で終了できれば、R も無事に動いています。</p>
+</details>
+<details class="success">
+<summary>問4 の解答・確認ポイント</summary>
+<ul>
+<li><code>pip list</code> … <code>numpy 2.x</code>、<code>pandas 2.x</code> のように「名前 バージョン」が縦に並びます。</li>
+<li><code>pip show pandas</code> … <code>Name: pandas</code> / <code>Version: …</code> / <code>Location: …</code>（保存場所）などが表示されます。</li>
+<li><code>pip freeze &gt; requirements.txt</code> … 画面には何も出ませんが、同じフォルダに <code>requirements.txt</code> ができ、<code>pandas==2.2.0</code> のような形で一覧が入っています。このファイルがあれば、別のPCで <code>pip install -r requirements.txt</code> を実行するだけで同じ環境を再現できます。</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">conda環境の人へ</p>
+<p>conda で入れたパッケージも <code>pip list</code> にはおおむね表示されます。ただし「環境まるごと」を厳密に再現したいときは、conda 側の <code>conda env export &gt; environment.yml</code> の方が確実です（詳しくは第19回で扱います）。</p>
+</div>
+</details>
+<hr />
+<h3 id="_9">次回予告<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<p><a href="../lesson-02/">第2回：はじめてのPython</a> では、Python を電卓のように使いながら、変数・データ型・分子量計算を学びます。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  ページトップへ戻る
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="フッター" >
+        
+          
+          <a href="../../roadmap/" class="md-footer__link md-footer__link--prev" aria-label="前: ロードマップ（全100回）">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                前
+              </span>
+              <div class="md-ellipsis">
+                ロードマップ（全100回）
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../lesson-02/" class="md-footer__link md-footer__link--next" aria-label="次: 第2回 はじめてのPython">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                次
+              </span>
+              <div class="md-ellipsis">
+                第2回 はじめてのPython
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "navigation.footer", "toc.follow", "content.code.copy", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version": "\u30d0\u30fc\u30b8\u30e7\u30f3\u5207\u308a\u66ff\u3048"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
