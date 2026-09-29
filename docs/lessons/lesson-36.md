@@ -139,6 +139,21 @@ print("保存しました")
 
 ---
 
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    pandas の DataFrame `polymers`（列: polymer [str], category [str], density [g/cm³], tensile_MPa [MPa], Tg_C [℃]）を category でグループ化し、
+    件数 n、引張強さの平均、Tg_C の平均と最大を1つの表にまとめてください（`agg` の名前付き集計を使用、小数第2位で丸め）。
+    数値列だけを集計の対象にし、結果を `polymer_summary.csv` に保存してください。
+
+!!! warning "AIの出力で確かめること"
+    - `polymers.groupby("category").mean()` のように**全列**を平均していないか。pandas 3.x では文字列列（polymer）があると `TypeError: dtype 'str' does not support operation 'mean'` になります。`groupby("category")[["数値列", ...]]` で列を選ぶか、`numeric_only=True` を付けます。
+    - 件数 n が正しいか。`polymers.groupby("category").size()` で thermoplastic 7・thermoset 2 になるかを確認します。n=2 のグループの平均や標準偏差は参考程度にしかならない、と結果を読む側も意識します。
+    - `sort_values(..., ascending=False)` の向き。「強い順」なら先頭が Nylon6（80 MPa）になっているかを見ます。
+    - 集計表を保存するとき、グループ名が index になっているので `to_csv` に `index=False` を付けると **category 列が消えます**。集計表は index 付きで保存します（`summary.to_csv("...")`）。
+
+---
+
 ## 演習問題
 
 **問1.** `polymers` を `density`（密度）の**小さい順**に並べ替えて、全体を表示してください。
@@ -146,6 +161,12 @@ print("保存しました")
 **問2.** `groupby` を使って、カテゴリ別の **ガラス転移点（Tg_C）の平均**を表示してください。
 
 **問3.** `agg` を使って、カテゴリ別に「件数 `n`」「Tg_C の平均 `Tg_mean`」「Tg_C の最大 `Tg_max`」をまとめた集計テーブルを作って表示してください。
+
+**問4.**（検証型）次は AI が「カテゴリ別に物性の平均をまとめる」ために書いたコードです。実行すると `TypeError: dtype 'str' does not support operation 'mean'` になりました。問題点を指摘し、直してください。さらに、各グループの件数も確認してください。
+
+```python
+print(polymers.groupby("category").mean())
+```
 
 ---
 
@@ -201,6 +222,29 @@ print("保存しました")
     thermoset      2   150.00     180
     ```
 
+??? success "問4 の解答"
+    **誤り**：`groupby("category").mean()` は、category 以外の**すべての列**を平均しようとします。`polymer` 列（PE, PP… の文字列）は平均できないので、pandas 3.x ではエラーになります（古い版では文字列列が黙って捨てられたため、AI はこの書き方をしがちです）。
+
+    **直し方**：平均したい数値列を `[[ ]]` で選んでから集計します（`mean(numeric_only=True)` でも同じ結果）。あわせて `size()` で件数を確認し、thermoset が2件しかないことを把握しておきます。
+
+    ```python
+    means = polymers.groupby("category")[["density", "tensile_MPa", "Tg_C"]].mean().round(2)
+    print(means)
+    print(polymers.groupby("category").size())
+    ```
+
+    出力:
+    ```text
+                   density  tensile_MPa    Tg_C
+    category                                   
+    thermoplastic     1.14        51.71   41.57
+    thermoset         1.25        55.00  150.00
+    category
+    thermoplastic    7
+    thermoset        2
+    dtype: int64
+    ```
+
 ---
 
 ## この回のまとめ
@@ -217,4 +261,4 @@ print("保存しました")
 
 ### 次回予告
 
-次は **第5部：データ可視化**へ。集計した結果を、matplotlib で**グラフ**にします。数字の表が、ひと目で分かる図に変わります。（※第4部の残り〈結合・ピボット・Excel入出力など〉と第5部は、続くバッチで作成します。）
+[第37回：列の追加・計算・変換](lesson-37.md) では、既存の列から比強度やケルビン温度などの新しい列を計算して追加し、条件による分類列も作ります。

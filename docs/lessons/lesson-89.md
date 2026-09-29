@@ -97,6 +97,19 @@ df <- tibble(
 print(df)
 ```
 
+出力:
+
+```text
+# A tibble: 3 × 3
+  name        MW  XLogP
+  <chr>    <dbl>  <dbl>
+1 ethanol   46.1 -0.076
+2 aspirin  180.   1.42 
+3 caffeine 194.  -0.495
+```
+
+tibble は有効数字3桁程度に丸めて表示します（`180.` は 180.16 の省略表示）。
+
 `sapply(mols, 関数)` は「リストの各要素に関数を適用」する R の書き方（Python の map に相当）。これで**分子記述子の表**ができ、`summary(df)` や `ggplot(df, ...)` で解析・作図できます。
 
 !!! success "分子 → 統計、R で一気通貫"

@@ -48,6 +48,8 @@ IUPAC名: 2-acetyloxybenzoic acid
 
 アスピリンの正式な情報が取得できました。`cid`（2244）は PubChem 内の固有IDです。
 
+名前が見つからないと `get_compounds` は空のリスト `[]` を返し、`[0]` で `IndexError` になります。実際に使うときは `results = pcp.get_compounds(name, "name")` として `if not results:` を確認します。
+
 ---
 
 ## 2. SMILES を取得して RDKit につなぐ
@@ -60,7 +62,7 @@ from rdkit import Chem
 from rdkit.Chem import Descriptors
 
 compound = pcp.get_compounds("caffeine", "name")[0]
-smiles = compound.connectivity_smiles          # 構造の SMILES
+smiles = compound.connectivity_smiles          # 立体を含まない SMILES（立体込みは compound.smiles）
 
 print("カフェインの SMILES:", smiles)
 
@@ -75,6 +77,9 @@ print("RDKitで計算した分子量:", round(Descriptors.MolWt(mol), 2))
 カフェインの SMILES: CN1C=NC2=C1C(=O)N(C(=O)N2C)C
 RDKitで計算した分子量: 194.19
 ```
+
+!!! note "`connectivity_smiles` と `smiles`"
+    PubChemPy 1.0.5 以降では、立体を含まない SMILES が `connectivity_smiles`、立体（`@`、`/`）を含む SMILES が `smiles` です（古い記事の `canonical_smiles` / `isomeric_smiles` は非推奨）。分子量の計算なら前者で十分ですが、L体/D体などを区別したいときは `smiles` を使います。
 
 !!! success "データ取得 → 自前の解析、の流れ"
     **PubChem から構造を取得 → RDKit で記述子を計算 → pandas で表に → 可視化**。
@@ -105,14 +110,29 @@ print(df.to_string(index=False))
 出力（取得時点の例）:
 
 ```text
-     name  CID  formula     MW
-  aspirin 2244   C9H8O4 180.16
+     name  CID   formula     MW
+  aspirin 2244    C9H8O4 180.16
  caffeine 2519 C8H10N4O2 194.19
-ibuprofen 3672 C13H18O2 206.28
+ibuprofen 3672  C13H18O2 206.28
 ```
 
 !!! warning "アクセスは控えめに"
-    データベースへの大量・高速なアクセスは、サーバーに負担をかけ、制限されることがあります。**必要な分だけ・間隔をあけて**取得し、一度取ったデータは CSV に保存して使い回しましょう（第32回）。
+    データベースへの大量・高速なアクセスは、サーバーに負担をかけ、制限されることがあります。**必要な分だけ・間隔をあけて**取得し、一度取ったデータは CSV に保存して使い回しましょう（第32回）。PubChem の利用規約の目安は **1秒あたり5リクエスト以下**です。ループでは `import time` して `time.sleep(0.2)` を入れましょう。
+
+---
+
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    「PubChemPy 1.0.5 以降で、化合物名のリストについて CID・分子式・分子量・立体込みの SMILES（`.smiles`）を取得し、DataFrame にして CSV に保存してください。
+    名前が見つからない（結果が空リスト）ときは止まらずに『見つからない』と記録し、リクエストの間に `time.sleep(0.2)` を入れてください。
+    取得した SMILES は RDKit で読み込み、InChIKey 列も追加してください。」
+
+!!! warning "AIの出力で確かめること"
+    - `pcp.get_compounds(...)[0]` と**空リストの確認なし**で書いていないか。スペルミス1つで `IndexError` になります。
+    - 使っている属性名：`canonical_smiles` / `isomeric_smiles` は非推奨（警告が出ます）。立体が必要なら `smiles`、不要なら `connectivity_smiles`。L-アラニンの SMILES に `@` が入っているかを print して確認します。
+    - 名前検索が**意図した化合物**を返したか：CID を表示し、既知の値（アスピリン 2244 など）や分子式と照合します。「glucose」のような一般名は、特定の立体異性体・アノマーの CID が返ることがあります。
+    - ループに待ち時間があるか、取得結果を CSV に保存して再取得を避けているか。
 
 ---
 
@@ -123,6 +143,27 @@ ibuprofen 3672 C13H18O2 206.28
 **問2.** グルコース（`"glucose"`）の SMILES を PubChem から取得し、その SMILES を RDKit に渡して分子量を計算してください。
 
 **問3.** 3つの溶媒 `["ethanol", "acetone", "toluene"]` の分子式と分子量を PubChem から取得し、DataFrame にまとめてください。
+
+**問4.** 次は AI が書いた「L-アラニンと D-アラニンが別の化合物として登録されているかを確かめる」コードです。「同じ化合物？ True」と出ました。問題点を指摘し、直してください。
+
+```python
+import pubchempy as pcp
+from rdkit import Chem
+
+smiles = {}
+for name in ["L-alanine", "D-alanine"]:
+    c = pcp.get_compounds(name, "name")[0]
+    smiles[name] = c.connectivity_smiles
+key_L = Chem.MolToInchiKey(Chem.MolFromSmiles(smiles["L-alanine"]))
+key_D = Chem.MolToInchiKey(Chem.MolFromSmiles(smiles["D-alanine"]))
+print("同じ化合物？", key_L == key_D)
+```
+
+AI の出力（取得時点の例）:
+
+```text
+同じ化合物？ True
+```
 
 ---
 
@@ -174,11 +215,40 @@ ibuprofen 3672 C13H18O2 206.28
 
     出力（取得時点の例）:
     ```text
-     name formula     MW
-  ethanol   C2H6O  46.07
-  acetone   C3H6O  58.08
-  toluene    C7H8  92.14
+       name formula    MW
+    ethanol   C2H6O 46.07
+    acetone   C3H6O 58.08
+    toluene    C7H8 92.14
     ```
+
+??? success "問4 の解答"
+    誤りは2つです。
+
+    1. **立体を含まない SMILES を使っている**：`connectivity_smiles` は立体情報を持たないので、L体もD体も `CC(C(=O)O)N` になり、InChIKey も同じになります。立体込みの `smiles` を使います。SMILES を print して `@` があるか見れば気づけます。
+    2. **検索結果が空のときの対策がない**：名前が見つからないと `[0]` で `IndexError` になります。また、ループには待ち時間を入れます。
+
+    ```python
+    import time
+    import pubchempy as pcp
+    from rdkit import Chem
+
+    for name in ["L-alanine", "D-alanine"]:
+        results = pcp.get_compounds(name, "name")
+        if not results:
+            print(name, "は見つかりませんでした")
+            continue
+        c = results[0]
+        key = Chem.MolToInchiKey(Chem.MolFromSmiles(c.smiles))
+        print(name, c.cid, c.smiles, key)
+        time.sleep(0.2)
+    ```
+
+    出力（取得時点の例）:
+    ```text
+    L-alanine 5950 C[C@@H](C(=O)O)N QNAYBMKLOCPYGJ-REOHCLBHSA-N
+    D-alanine 71080 C[C@H](C(=O)O)N QNAYBMKLOCPYGJ-UWTATZPHSA-N
+    ```
+    InChIKey の前半（骨格）は同じで、後半（立体の部分）が違う＝立体異性体だと分かります。
 
 ---
 

@@ -63,10 +63,12 @@ mw = Descriptors.MolWt(mol)
 ```
 
 ```{r}
-# R で統計・作図（Python の結果を受け取ることも可能）
-cat("分子量は Python で計算しました\n")
+# R で統計・作図（Python の変数は py$変数名 で受け取れる）
+cat("アスピリンの分子量:", round(py$mw, 2), "\n")
 ```
 ````
+
+R チャンクからは `py$mw` のように `py$` を付けて Python 側の変数を参照できます（reticulate が必要）。
 
 「RDKit（Python）で分子を処理 → その結果を R で統計解析・作図 → Quarto で1つのレポートに」——2言語のいいとこ取りができます。
 

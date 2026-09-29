@@ -15,7 +15,7 @@
 
 ## 1. IR ピークを表にする
 
-赤外分光（IR）のピーク（波数・強度・帰属）を DataFrame にします。
+赤外分光（IR）のピーク（波数・強度・帰属）を DataFrame にします。値はアスピリンの主な吸収帯を丸めたものです（カルボン酸の O–H は実際には 2500〜3300 cm⁻¹ の幅広い吸収になります）。
 
 ```python
 import pandas as pd
@@ -70,10 +70,11 @@ print(carbonyl)
 ```python
 import pandas as pd
 
+# 3-フェニルプロパン酸 PhCH2CH2COOH の ¹H NMR（CDCl3、代表値を丸めた例）
 nmr = pd.DataFrame({
-    "shift_ppm":  [2.1, 3.7, 7.3, 11.0],       # 化学シフト [ppm]
-    "integration": [3, 2, 5, 1],                # 積分値（プロトン数の比）
-    "assignment": ["CH3", "CH2", "aromatic H", "COOH"],
+    "shift_ppm":  [2.7, 3.0, 7.3, 11.0],       # 化学シフト [ppm]
+    "integration": [2, 2, 5, 1],                # 積分値（プロトン数の比）
+    "assignment": ["CH2COOH", "PhCH2", "aromatic H", "COOH"],
 })
 
 # 積分値の合計＝全プロトン数
@@ -89,19 +90,34 @@ print(aromatic)
 
 ```text
    shift_ppm  integration  assignment
-0        2.1            3         CH3
-1        3.7            2         CH2
+0        2.7            2     CH2COOH
+1        3.0            2       PhCH2
 2        7.3            5  aromatic H
 3       11.0            1        COOH
-全プロトン数: 11
+全プロトン数: 10
    shift_ppm  integration  assignment
 2        7.3            5  aromatic H
 ```
 
-積分値の合計（11）から全プロトン数が、芳香族領域の抽出から芳香環の存在が読み取れます。
+積分値の合計（10）から全プロトン数（C9H10O2 の H 10個）が、芳香族領域の抽出から芳香環の存在が読み取れます。
 
 !!! success "スペクトル解析も"データ分析""
     ピークの抽出・帰属・集計は、すべて pandas の操作です。分光データを表にすれば、複数サンプルの比較、ピークの自動検出（数値データの場合）、レポート用の表作成が、これまでの技術でできます。第5部を使えばスペクトルの可視化も可能です。
+
+---
+
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    「IR ピーク表（列：wavenumber [cm⁻¹]、assignment、intensity）の pandas DataFrame から、カルボニル領域 1650〜1800 cm⁻¹ のピークを抽出してください。
+    条件は `(ir["wavenumber"] >= 1650) & (ir["wavenumber"] <= 1800)` の形で、`&` と括弧を使ってください。
+    あわせて波数を波長 [µm] に換算した列（波長 = 10⁴ / 波数）を追加し、どちらも単位を列名に入れてください。」
+
+!!! warning "AIの出力で確かめること"
+    - **範囲の条件が `&`（かつ）になっているか**。`|`（または）だと全ピークが通ります。抽出後の行数を print し、期待（酢酸エチルならカルボニルは 1本）と比べます。
+    - **単位換算の係数**：波数 [cm⁻¹] → 波長 [µm] は 10000 / 波数。1742 cm⁻¹ が約 5.74 µm になるかで確認します。
+    - 帰属が教科書の範囲と合うか：C=O は 1650〜1800 cm⁻¹、O–H（カルボン酸）は 2500〜3300 cm⁻¹ の幅広い吸収、¹H NMR の芳香族 H は 6.5〜8.5 ppm、COOH は 10〜13 ppm。
+    - NMR の積分値の合計が、想定した分子式の H の数と一致するか（AI が作った「例」のデータが実在の構造として成り立つか）。
 
 ---
 
@@ -111,7 +127,35 @@ print(aromatic)
 
 **問2.** 本文の `nmr` データを、化学シフト（shift_ppm）の**大きい順**に並べ替えてください（第36回）。
 
-**問3.** `nmr` データで、脂肪族領域（0〜5 ppm）のピークだけを抽出し、その積分値の合計を計算してください。
+**問3.** `nmr` データで、sp3 炭素上の H が主に現れる 0〜5 ppm の領域のピークだけを抽出し、その積分値の合計を計算してください。
+
+**問4.** 次は AI が書いた「酢酸エチルの IR ピーク表に波長の列を加え、カルボニル領域のピーク数を数える」コードです。問題点を指摘し、直してください。
+
+```python
+import pandas as pd
+
+# 酢酸エチルの IR ピーク（液膜、代表値）
+ir = pd.DataFrame({
+    "wavenumber": [2983, 1742, 1374, 1243, 1047],    # 波数 [cm^-1]
+    "assignment": ["C-H", "C=O", "C-H bend", "C-O", "C-O"],
+})
+ir["wavelength_um"] = (1000 / ir["wavenumber"]).round(2)    # 波長 [µm]
+carbonyl = ir[(ir["wavenumber"] >= 1650) | (ir["wavenumber"] <= 1800)]
+print(ir)
+print("カルボニル領域のピーク数:", len(carbonyl))
+```
+
+AI の出力:
+
+```text
+   wavenumber assignment  wavelength_um
+0        2983        C-H           0.34
+1        1742        C=O           0.57
+2        1374   C-H bend           0.73
+3        1243        C-O           0.80
+4        1047        C-O           0.96
+カルボニル領域のピーク数: 5
+```
 
 ---
 
@@ -141,8 +185,8 @@ print(aromatic)
        shift_ppm  integration  assignment
     3       11.0            1        COOH
     2        7.3            5  aromatic H
-    1        3.7            2         CH2
-    0        2.1            3         CH3
+    1        3.0            2       PhCH2
+    0        2.7            2     CH2COOH
     ```
 
 ??? success "問3 の解答"
@@ -155,9 +199,39 @@ print(aromatic)
     出力:
     ```text
        shift_ppm  integration assignment
-    0        2.1            3        CH3
-    1        3.7            2        CH2
-    積分値の合計: 5
+    0        2.7            2    CH2COOH
+    1        3.0            2      PhCH2
+    積分値の合計: 4
+    ```
+
+??? success "問4 の解答"
+    誤りは2つです。
+
+    1. **範囲の条件が「または」**：`|` だと「1650 以上 **または** 1800 以下」となり、すべての波数が当てはまります。範囲は `&`（かつ）で書きます。酢酸エチルの C=O は1本なのに 5 本と出た時点でおかしいと分かります。
+    2. **波長の換算係数が1桁違う**：1 cm = 10⁴ µm なので、波長 [µm] = 10000 / 波数 [cm⁻¹]。中赤外は約 2.5〜25 µm なので、0.3〜1 µm（可視〜近赤外）という値はおかしいと気づけます。
+
+    ```python
+    import pandas as pd
+
+    ir = pd.DataFrame({
+        "wavenumber": [2983, 1742, 1374, 1243, 1047],    # 波数 [cm^-1]
+        "assignment": ["C-H", "C=O", "C-H bend", "C-O", "C-O"],
+    })
+    ir["wavelength_um"] = (10000 / ir["wavenumber"]).round(2)   # 1 cm = 10^4 µm
+    carbonyl = ir[(ir["wavenumber"] >= 1650) & (ir["wavenumber"] <= 1800)]
+    print(ir)
+    print("カルボニル領域のピーク数:", len(carbonyl))
+    ```
+
+    出力:
+    ```text
+       wavenumber assignment  wavelength_um
+    0        2983        C-H           3.35
+    1        1742        C=O           5.74
+    2        1374   C-H bend           7.28
+    3        1243        C-O           8.05
+    4        1047        C-O           9.55
+    カルボニル領域のピーク数: 1
     ```
 
 ---

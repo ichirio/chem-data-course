@@ -78,7 +78,7 @@ ethanol の分子量: 46.069
 `water.molar_mass()` のように、**オブジェクトに「.」でメソッドを呼びます**。データ（組成）と処理（分子量計算）が1つにまとまり、扱いやすくなりました。
 
 !!! tip "これまで使ってきた `.` の正体"
-    `"H2O".upper()` や `df.mean()` の `.` は、まさにこれ——**オブジェクトのメソッドを呼んでいた**のです。文字列も DataFrame も、実はクラスから作られたオブジェクトです。
+    `"H2O".upper()`（第9回）や `elements.append("P")`（第3回）の `.` は、まさにこれ——**オブジェクトのメソッドを呼んでいた**のです。文字列もリストも、そして第4部で学ぶ pandas の DataFrame も、実はクラスから作られたオブジェクトです。
 
 ---
 
@@ -105,6 +105,24 @@ methane: 16.043 g/mol
 glucose: 180.156 g/mol
 ```
 
+数値は同じですが、単位 g/mol を付けるときの正式な名前は**モル質量**、単位なしの値が**分子量（相対分子質量）**です。メソッド名を `molar_mass`（モル質量）にしているのはこのためです。
+
+---
+
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    「分子を表す `Molecule` クラスを作ってください。`__init__(self, name, comp)` で名前と組成（例: `{"H": 2, "O": 1}`）を受け取ります。
+    メソッドは、モル質量 [g/mol] を返す `molar_mass()` と、元素 `symbol` の質量百分率 [%] を返す `mass_percent(symbol)` の2つ。
+    原子量はクラス属性の辞書 `ATOMIC_MASS`（H 1.008, C 12.011, N 14.007, O 15.999）を使ってください。
+    水で動作確認し、全元素の質量百分率の合計が 100 % になることも print してください。」
+
+!!! warning "AIの出力で確かめること"
+    - メソッドの中で `self.comp` のように **`self.` を付けて**属性を使っているか。付け忘れると `NameError` になるか、同名のグローバル変数を黙って使ってしまいます。
+    - 質量百分率に**原子数を掛けているか**（`ATOMIC_MASS[s] * self.comp[s]`）。全元素の合計が 100 % になるかを print して確かめる。水なら H 11.19 %、O 88.81 %。
+    - 呼び出しに `()` が付いているか。`water.molar_mass` と書くと、値ではなく `<bound method ...>` が表示されます。
+    - `water.molar_mass()` が 18.015、`Molecule("glucose", {"C": 6, "H": 12, "O": 6}).molar_mass()` が 180.156 など、知っている値と一致するか。
+
 ---
 
 ## 演習問題
@@ -114,6 +132,34 @@ glucose: 180.156 g/mol
 **問2.** `Molecule` クラスに、原子の総数を返すメソッド `atom_count` を追加してください（ヒント：`sum(self.comp.values())`）。水なら 3、グルコースなら 24 になります。
 
 **問3.** 3つの分子（水・アンモニア `{"N":1,"H":3}`・メタノール `{"C":1,"H":4,"O":1}`）をリストに入れ、for ループで「名前・分子量・原子数」を表示してください。
+
+**問4.** 次は AI が `Molecule` クラスに「元素の質量百分率」を返すメソッドを追加したコードです。水の H と O の質量百分率を表示していますが、おかしな点があります。問題点を指摘し、どう確かめればよいかも含めて直してください。
+```python
+class Molecule:
+    ATOMIC_MASS = {"H": 1.008, "C": 12.011, "O": 15.999, "N": 14.007}
+
+    def __init__(self, name, comp):
+        self.name = name
+        self.comp = comp
+
+    def molar_mass(self):
+        return sum(self.ATOMIC_MASS[s] * n for s, n in self.comp.items())
+
+    def mass_percent(self, symbol):
+        """元素 symbol の質量百分率 [%] を返す"""
+        return self.ATOMIC_MASS[symbol] / self.molar_mass() * 100
+
+
+water = Molecule("water", {"H": 2, "O": 1})
+print(f"H: {water.mass_percent('H'):.2f} %")
+print(f"O: {water.mass_percent('O'):.2f} %")
+```
+
+出力:
+```text
+H: 5.60 %
+O: 88.81 %
+```
 
 ---
 
@@ -173,6 +219,41 @@ glucose: 180.156 g/mol
     methanol: 32.042 g/mol, 原子数 6
     ```
 
+??? success "問4 の解答"
+    **誤り：`mass_percent` で、原子量に原子数（`self.comp[symbol]`）を掛けていません。** 水には H が2個あるので、H の質量は 1.008 × 2 です。O は1個なので偶然正しい値になり、見落としやすい誤りです。
+
+    **確かめ方：** 全元素の質量百分率を合計すると 100 % になるはずです。元のコードでは 5.60 + 88.81 = 94.41 % にしかならず、誤りに気づけます。
+
+    ```python
+    class Molecule:
+        ATOMIC_MASS = {"H": 1.008, "C": 12.011, "O": 15.999, "N": 14.007}
+
+        def __init__(self, name, comp):
+            self.name = name
+            self.comp = comp
+
+        def molar_mass(self):
+            return sum(self.ATOMIC_MASS[s] * n for s, n in self.comp.items())
+
+        def mass_percent(self, symbol):
+            """元素 symbol の質量百分率 [%] を返す"""
+            return self.ATOMIC_MASS[symbol] * self.comp[symbol] / self.molar_mass() * 100
+
+
+    water = Molecule("water", {"H": 2, "O": 1})
+    print(f"H: {water.mass_percent('H'):.2f} %")
+    print(f"O: {water.mass_percent('O'):.2f} %")
+    total = sum(water.mass_percent(s) for s in water.comp)
+    print(f"合計: {total:.2f} %")
+    ```
+
+    出力:
+    ```text
+    H: 11.19 %
+    O: 88.81 %
+    合計: 100.00 %
+    ```
+
 ---
 
 ## この回のまとめ
@@ -180,7 +261,7 @@ glucose: 180.156 g/mol
 - クラスは「データ＋処理」をまとめた設計図。実体がインスタンス。
 - `__init__(self, ...)` で初期化、`self.属性` にデータをしまう。
 - クラス内の関数＝メソッド。`オブジェクト.メソッド()` で呼ぶ。
-- 文字列や DataFrame の `.メソッド()` も、この仕組みだった。
+- 文字列やリストの `.メソッド()` も、この仕組みだった。
 
 ### 次回予告
 

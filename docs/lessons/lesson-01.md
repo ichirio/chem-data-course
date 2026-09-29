@@ -25,7 +25,7 @@
 インストールを始める前に、**もう入っているものは飛ばして構いません**。ターミナル（Windows は「Miniforge Prompt」か「PowerShell」、Ubuntu は端末）で次を打って確認します。
 
 ```bash
-python --version     # 例: Python 3.12.3  → 出れば Python は導入済み
+python --version     # 例: Python 3.12.3  → 出れば Python は導入済み（Ubuntu は python3 --version）
 conda --version      # 例: conda 24.x     → 出れば Miniforge/conda 導入済み
 R --version          # 先頭に R version … → 出れば R は導入済み
 git --version        # 例: git version 2.x → 出れば Git は導入済み
@@ -107,16 +107,23 @@ python --version
 
     ```bash
     # 好きな作業フォルダの中で実行（例：chem-course フォルダ）
+    # --- Windows (PowerShell) ---
     python -m venv chem-env          # chem-env という環境フォルダを作る
+    chem-env\Scripts\Activate.ps1    # 環境に「入る」
 
-    # 環境に「入る」
-    # Windows (PowerShell):
-    chem-env\Scripts\Activate.ps1
-    # Ubuntu / macOS:
-    source chem-env/bin/activate
+    # --- Ubuntu / macOS ---
+    # （Ubuntu は初回のみ: sudo apt install python3-venv -y）
+    python3 -m venv chem-env         # Ubuntu は python ではなく python3
+    source chem-env/bin/activate     # 環境に「入る」
     ```
 
     入ると行の先頭に `(chem-env)` と表示されます。
+
+    !!! warning "Windows で「スクリプトの実行が無効」と出たら"
+        PowerShell の初期設定では `Activate.ps1` を実行できないことがあります。次を一度だけ実行してから、もう一度 activate してください。
+        ```powershell
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+        ```
 
 !!! tip "毎回のはじめに（超重要）"
     作業を始めるたびに、環境に「入る」操作が必要です。
@@ -207,6 +214,7 @@ pip show pandas                 # 詳細（バージョン・保存場所など�
     pip freeze > requirements.txt      # 今の環境を書き出す
     pip install -r requirements.txt    # 別のPCでまとめて入れる
     ```
+    conda環境で `pip freeze` を使うと、conda で入れたパッケージが `numpy @ file:///...` のような「自分のPCの中の場所」で書き出され、別のPCでは使えません。conda環境の人は `pip list --format=freeze > requirements.txt` を使うか、conda の `conda env export > environment.yml` を使いましょう。
 
 !!! warning "conda環境で pip を使うときの注意"
     conda環境の中で pip も使えますが、**同じパッケージを conda と pip の両方で入れない**でください（競合の原因）。
@@ -297,7 +305,7 @@ VS Code は「どの Python を使うか」を自動では決めません。ス�
 
 1. コマンドパレットを開く：**Ctrl + Shift + P**（Mac は **⌘ + Shift + P**）
 2. `Python: Select Interpreter` と入力して選ぶ
-3. 一覧から **`chem`**（`…\miniforge3\envs\chem\python.exe` のようなパス）を選ぶ
+3. 一覧から **`chem`**（Windows は `…\miniforge3\envs\chem\python.exe`、Ubuntu は `~/miniforge3/envs/chem/bin/python` のようなパス）を選ぶ
    （venv の人は `chem-env` を選びます）
 
 選ぶと画面下の青いバーに `Python 3.12.x ('chem')` のように表示されます。以降は——
@@ -314,10 +322,10 @@ Windows は文字コードの既定が UTF-8 ではない（**cp932**＝Shift_JI
 
 ```text
 縺薙ｓ縺ｫ縺｡縺ｯ
-豌ｴ (H2O) 縺ｮ蛻�蟄宣㍼縺ｯ 18.015 g/mol 縺ｧ縺�
+豌ｴ (H2O) 縺ｮ繝｢繝ｫ雉ｪ驥上�ｯ 18.015 g/mol 縺ｧ縺�
 ```
 
-本当は「こんにちは」「水 (H2O) の分子量は 18.015 g/mol です」と出したいのに、です。ときには `UnicodeEncodeError: 'cp932' codec can't encode …` というエラーで止まることもあります。
+本当は「こんにちは」「水 (H2O) のモル質量は 18.015 g/mol です」と出したいのに、です。ときには `UnicodeEncodeError: 'cp932' codec can't encode …` というエラーで止まることもあります。
 
 これは **VS Code の設定で UTF-8 に統一**すれば解決します。
 
@@ -383,7 +391,7 @@ atomic_mass = {"H": 1.008, "O": 15.999}   # 原子量（g/mol）
 water = 2 * atomic_mass["H"] + 1 * atomic_mass["O"]
 
 print("はじめまして、化学データ分析の世界へ！")
-print(f"水 (H2O) の分子量は {water:.3f} g/mol です")
+print(f"水 (H2O) のモル質量は {water:.3f} g/mol です")
 
 # いま使っている Python のバージョンも確認
 import sys
@@ -403,12 +411,29 @@ python hello_chem.py
 
 ```text
 はじめまして、化学データ分析の世界へ！
-水 (H2O) の分子量は 18.015 g/mol です
+水 (H2O) のモル質量は 18.015 g/mol です
 Python: 3.12.x
 ```
 
 !!! success "ここまでできたら"
     環境構築は完了です。おめでとうございます！ ここが一番の山場でした。次回からは実際にプログラムを書いていきます。
+
+---
+
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    Windows 11 に Miniforge を入れ、`conda create -n chem python=3.12` で chem 環境を作りました。
+    この chem 環境に RDKit・pandas・matplotlib を入れたいので、Miniforge Prompt で打つコマンドを1行ずつ意味つきで教えてください。
+    条件：base 環境には何も入れない／同じパッケージを conda と pip の両方で入れない／管理者権限や `sudo` は使わない。
+    最後に、chem 環境の Python に入ったことを確かめるコマンドも付けてください。
+
+!!! warning "AIの出力で確かめること"
+    - 手順の最初に `conda activate chem` があるか。先頭が `(base)` のまま `install` すると、chem ではなく base に入ってしまいます。
+    - 同じパッケージを `conda install` と `pip install` の両方で入れる手順になっていないか。conda環境なら RDKit は `conda install -c conda-forge rdkit -y` の1本で十分です。
+    - 実行後に `python -c "import sys; print(sys.executable)"` を打ち、表示されたパスに `envs\chem`（Ubuntu は `envs/chem`）が含まれるか。含まれなければ別の Python が動いています。
+    - `conda list rdkit` の Channel 列が `conda-forge` になっているか（pip で入ったものは `pypi` と表示されます）。
+    - `sudo pip install` や、Ubuntu のシステムの Python（`/usr/bin/python3`）に直接入れる手順を勧めていたら採用しない。
 
 ---
 
@@ -423,7 +448,7 @@ print("pandas:", pandas.__version__)
 print("matplotlib:", matplotlib.__version__)
 ```
 
-**問2.** `hello_chem.py` をまねて、**二酸化炭素 CO₂ の分子量**を計算して表示するプログラムを書いてください。炭素 C の原子量は 12.011、酸素 O は 15.999 とします。
+**問2.** `hello_chem.py` をまねて、**二酸化炭素 CO₂ のモル質量（g/mol）**を計算して表示するプログラムを書いてください。炭素 C の原子量は 12.011、酸素 O は 15.999 とします。
 
 **問3.**（余力があれば）R も動くか確認しましょう。ターミナルで `R` と打つと R が起動します。次を入力してみてください。
 
@@ -438,6 +463,15 @@ q()                  # R を終了（Save workspace? は n でOK）
 2. `pip show pandas` で pandas の詳細（バージョンなど）を表示する。
 3. `pip freeze > requirements.txt` で一覧をファイルに書き出し、中身を開いて確認する。
 
+
+**問5.**（検証）「VS Code で `import rdkit` すると `ModuleNotFoundError` が出る」と相談したところ、AI が次のコマンドを示しました。VS Code では `chem` 環境を選んでいます。このコマンドの問題点を2つ指摘し、正しい手順に直してください。
+
+```bash
+conda activate base
+pip install rdkit
+conda install -c conda-forge rdkit -y
+```
+
 ---
 
 ## 解答
@@ -450,24 +484,47 @@ q()                  # R を終了（Save workspace? は n でOK）
     # 二酸化炭素 CO2 の分子量
     atomic_mass = {"C": 12.011, "O": 15.999}
     co2 = 1 * atomic_mass["C"] + 2 * atomic_mass["O"]
-    print(f"二酸化炭素 (CO2) の分子量は {co2:.3f} g/mol です")
+    print(f"二酸化炭素 (CO2) のモル質量は {co2:.3f} g/mol です")
     ```
 
     出力:
     ```text
-    二酸化炭素 (CO2) の分子量は 44.009 g/mol です
+    二酸化炭素 (CO2) のモル質量は 44.009 g/mol です
     ```
 
 ??? success "問3 の解答・確認ポイント"
     `R` を起動して式を入力すると、`[1] 18.015` のように答えが表示されます。`[1]` は「結果の1個目」という R の印です。`q()` で終了できれば、R も無事に動いています。
 
 ??? success "問4 の解答・確認ポイント"
-    - `pip list` … `numpy 2.x`、`pandas 2.x` のように「名前 バージョン」が縦に並びます。
+    - `pip list` … `numpy 2.x`、`pandas 3.x` のように「名前 バージョン」が縦に並びます。
     - `pip show pandas` … `Name: pandas` / `Version: …` / `Location: …`（保存場所）などが表示されます。
-    - `pip freeze > requirements.txt` … 画面には何も出ませんが、同じフォルダに `requirements.txt` ができ、`pandas==2.2.0` のような形で一覧が入っています。このファイルがあれば、別のPCで `pip install -r requirements.txt` を実行するだけで同じ環境を再現できます。
+    - `pip freeze > requirements.txt` … 画面には何も出ませんが、同じフォルダに `requirements.txt` ができ、`pandas==2.2.0` のような形で一覧が入っています（conda環境では `pandas @ file:///...` のような行が混ざることがあります。そのときは `pip list --format=freeze > requirements.txt` を使います）。このファイルがあれば、別のPCで `pip install -r requirements.txt` を実行するだけで同じ環境を再現できます。
 
     !!! note "conda環境の人へ"
         conda で入れたパッケージも `pip list` にはおおむね表示されます。ただし「環境まるごと」を厳密に再現したいときは、conda 側の `conda env export > environment.yml` の方が確実です（詳しくは第19回で扱います）。
+
+
+??? success "問5 の解答"
+    **問題点1：base 環境に入れている。** 1行目で `base` に入っているので、RDKit は base に入ります。VS Code が使っているのは `chem` なので、`ModuleNotFoundError` は直りません。
+
+    **問題点2：同じ RDKit を pip と conda の両方で入れている。** ステップ2.5 の注意のとおり、競合の原因になります。conda環境では conda-forge の1本にします。
+
+    **確かめ方**：ターミナルの先頭が `(chem)` か、`python -c "import sys; print(sys.executable)"` のパスに `envs\chem`（Ubuntu は `envs/chem`）が含まれるかを見ます。
+
+    **正しい手順**：
+    ```bash
+    conda activate chem
+    conda install -c conda-forge rdkit -y
+    python -c "import sys, rdkit; print(sys.executable); print('RDKit', rdkit.__version__)"
+    ```
+
+    出力（例。パスとバージョンは環境によって異なります）:
+    ```text
+    C:\Users\<ユーザー名>\miniforge3\envs\chem\python.exe
+    RDKit 2026.03.6
+    ```
+
+    base に入ってしまった RDKit は、`conda activate base` のあと `pip uninstall rdkit -y` と `conda remove rdkit -y` で取り除けます。
 
 ---
 

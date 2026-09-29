@@ -28,7 +28,7 @@ polymers = pd.DataFrame({
 列は**まとめて計算**できます（1行ずつ書く必要はありません）。比強度（引張強さ÷密度）と、ガラス転移点のケルビン換算を追加してみましょう。
 
 ```python
-polymers["specific_strength"] = (polymers["tensile_MPa"] / polymers["density"]).round(1)
+polymers["specific_strength"] = (polymers["tensile_MPa"] / polymers["density"]).round(1)   # 比強度 [MPa/(g/cm³)] = [kN·m/kg]
 polymers["Tg_K"] = polymers["Tg_C"] + 273.15
 
 print(polymers[["polymer", "tensile_MPa", "density", "specific_strength", "Tg_K"]].head(4))
@@ -50,7 +50,7 @@ print(polymers[["polymer", "tensile_MPa", "density", "specific_strength", "Tg_K"
 
 ## 2. apply()：条件で分類する列を作る
 
-「引張強さが 55 MPa 以上なら high、そうでなければ standard」のような**判定つきの列**は、`apply()` に関数を渡して作ります。手軽な**ラムダ式**（第14回で詳説）を使います。
+「引張強さが 55 MPa 以上なら high、そうでなければ standard」のような**判定つきの列**は、`apply()` に関数を渡して作ります。第14回で学んだ**ラムダ式**を使います。
 
 ```python
 polymers["grade"] = polymers["tensile_MPa"].apply(lambda x: "high" if x >= 55 else "standard")
@@ -103,6 +103,23 @@ True
 
 ---
 
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    pandas の DataFrame `polymers`（density [g/cm³], tensile_MPa [MPa], Tg_C [℃]）に、次の3列を追加してください。
+    ① density_kg_m3：密度を kg/m³ に換算（1 g/cm³ = 1000 kg/m³）、② Tg_K：Tg をケルビンに換算（+273.15）、
+    ③ grade：tensile_MPa が 55 以上なら "high"、それ以外は "standard"。
+    元の列は変えず、追加した列を polymer と並べて表示してください。
+
+!!! warning "AIの出力で確かめること"
+    - 換算の向き。密度は g/cm³ → kg/m³ で **×1000**（PE 0.94 → 940）。÷1000 だと 0.00094 kg/m³ になり、空気（約 1.2 kg/m³）より軽い固体という、あり得ない値になります。
+    - 温度換算は K = ℃ **+ 273.15**。Tg_K が負になっていたら符号の誤りです（ケルビンは負になりません）。PE は 163.15 K になるはずです。
+    - 条件の境界 `>=` と `>`。PET（ちょうど 55 MPa）が "high" になっているかで確かめます。
+    - `rename` や `sort_values` の結果を**代入し直しているか**。`df.rename(...)` と書いただけでは元の表は変わりません。`print(df.columns)` で確認します。
+    - 新しい列名に単位が入っているか（`Tg_K`, `density_kg_m3` など）。単位の無い列名は、後で取り違える原因になります。
+
+---
+
 ## 演習問題
 
 **問1.** `polymers` に、密度を kg/m³ に直した列 `density_kg_m3` を追加してください（g/cm³ × 1000）。先頭5行を表示しましょう。
@@ -110,6 +127,22 @@ True
 **問2.** `apply` を使って、`Tg_C` が 100 以上なら `"high-Tg"`、未満なら `"low-Tg"` とする列 `tg_class` を追加し、`polymer` と一緒に表示してください。
 
 **問3.** 列 `tensile_MPa` を `tensile_strength_MPa` に変更した新しい表を `rename` で作り、列名一覧を表示してください（元の `polymers` は変えないこと）。
+
+**問4.**（検証型）次は AI が「密度を kg/m³ に、Tg をケルビンに換算した列を追加する」ために書いたコードとその出力です。問題点を**2つ**指摘し、直してください。
+
+```python
+polymers["density_kg_m3"] = polymers["density"] / 1000
+polymers["Tg_K"] = polymers["Tg_C"] - 273.15
+print(polymers[["polymer", "density_kg_m3", "Tg_K"]].head(3))
+```
+
+出力:
+```text
+  polymer  density_kg_m3    Tg_K
+0      PE       0.000940 -383.15
+1      PP       0.000905 -283.15
+2      PS       0.001050 -173.15
+```
 
 ---
 
@@ -156,6 +189,33 @@ True
     renamed = polymers.rename(columns={"tensile_MPa": "tensile_strength_MPa"})
     print(list(renamed.columns))
     print("元は変わらない:", "tensile_MPa" in polymers.columns)
+    ```
+
+    出力:
+    ```text
+    ['polymer', 'category', 'density', 'tensile_strength_MPa', 'Tg_C', 'specific_strength', 'Tg_K', 'grade', 'density_kg_m3', 'tg_class']
+    元は変わらない: True
+    ```
+
+    （本文と問1・問2で追加した列も並びます。`tensile_MPa` だけが `tensile_strength_MPa` に変わっていることを確認しましょう。）
+
+??? success "問4 の解答"
+    **誤り1（単位換算の向き）**：1 g/cm³ = 1000 kg/m³ なので、kg/m³ にするには **×1000** です。÷1000 の結果 0.00094 kg/m³ は、空気（約 1.2 kg/m³）よりはるかに軽い「固体」になってしまいます。
+
+    **誤り2（符号）**：K = ℃ **+ 273.15** です。ケルビンは絶対温度なので負の値にはなりません。−383.15 K という出力を見た時点でおかしいと分かります。
+
+    ```python
+    polymers["density_kg_m3"] = polymers["density"] * 1000
+    polymers["Tg_K"] = polymers["Tg_C"] + 273.15
+    print(polymers[["polymer", "density", "density_kg_m3", "Tg_C", "Tg_K"]].head(3))
+    ```
+
+    出力:
+    ```text
+      polymer  density  density_kg_m3  Tg_C    Tg_K
+    0      PE    0.940          940.0  -110  163.15
+    1      PP    0.905          905.0   -10  263.15
+    2      PS    1.050         1050.0   100  373.15
     ```
 
 ---

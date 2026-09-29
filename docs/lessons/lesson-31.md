@@ -27,7 +27,7 @@ import pandas as pd
 oxides = pd.DataFrame({
     "oxide":       ["Alumina", "Titania", "Silica", "Zinc oxide", "Magnesia", "Zirconia"],
     "formula":     ["Al2O3", "TiO2", "SiO2", "ZnO", "MgO", "ZrO2"],
-    "density":     [3.95, 4.23, 2.65, 5.61, 3.58, 5.68],       # g/cm^3
+    "density":     [3.95, 4.23, 2.65, 5.61, 3.58, 5.68],       # g/cm^3（TiO2 はルチル、SiO2 は α-石英の値）
     "melting_C":   [2072, 1843, 1713, 1974, 2852, 2715],       # 融点 [℃]
     "band_gap_eV": [8.8, 3.2, 9.0, 3.37, 7.8, 5.0],            # バンドギャップ [eV]
 })
@@ -74,8 +74,8 @@ print(oxides.dtypes)     # 各列のデータ型
 1  Titania    TiO2     4.23       1843          3.2
 2   Silica    SiO2     2.65       1713          9.0
 ['oxide', 'formula', 'density', 'melting_C', 'band_gap_eV']
-oxide           object
-formula         object
+oxide              str
+formula            str
 density        float64
 melting_C        int64
 band_gap_eV    float64
@@ -83,7 +83,7 @@ dtype: object
 ```
 
 !!! tip "型（dtype）の読み方"
-    - `object` … 文字列（名前や化学式）
+    - `str` … 文字列（名前や化学式）。pandas 2.x 以前では `object` と表示されます
     - `int64` … 整数（融点）
     - `float64` … 小数（密度・バンドギャップ）
 
@@ -148,6 +148,21 @@ Name: density, dtype: float64
 
 ---
 
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    pandas で、金属酸化物6種（Al2O3, TiO2, SiO2, ZnO, MgO, ZrO2）の物性表を DataFrame にしてください。
+    列は oxide（名前）, formula（化学式）, density [g/cm³], melting_C [℃], band_gap_eV [eV] の5列で、単位はコメントで明記してください。
+    作ったら shape・dtypes・describe() を print し、密度の平均を小数第3位まで表示してください。
+
+!!! warning "AIの出力で確かめること"
+    - `print(df.shape)` が `(6, 5)` か。行や列が抜けていないか（AI は辞書のリストの長さをそろえ損ねることがあり、そのときは `ValueError: All arrays must be of the same length` になります）。
+    - `print(df.dtypes)` で、density・band_gap_eV が `float64`、melting_C が `int64`、名前と化学式が `str`（pandas 2.x では `object`）になっているか。数値列が `str` なら、どこかに文字（単位や全角数字）が混じっています。
+    - `describe()` の min / max が化学的にありうる範囲か。酸化物の密度はおおむね 2〜10 g/cm³ で、たとえば 56.1 のような値は桁の打ち間違いです。
+    - 融点が ℃ か K か。コメントや列名に単位が書かれているかを確認し、MgO の融点が 2852（℃）なのか 3125（K）なのかを取り違えていないか見ます。
+
+---
+
 ## 演習問題
 
 **問1.** 本文の `oxides` を作り、(a) 表全体、(b) 形 `shape`、(c) 先頭2行 `head(2)` を表示してください。
@@ -155,6 +170,19 @@ Name: density, dtype: float64
 **問2.** `melting_C`（融点）の列について、**平均・最大・最小**を表示してください。
 
 **問3.** 新しい材料データを自分で1つ作ってみましょう。3種類の半導体材料について、`material`（名前）・`band_gap_eV`（バンドギャップ）の2列を持つ DataFrame を作り、`describe()` で要約を表示してください。例：Silicon 1.12、Germanium 0.67、GaAs 1.42。
+
+**問4.**（検証型）次は AI が「金属酸化物4種の密度をまとめて、形と要約統計を確認する」ために書いたコードです。実行すると `TypeError: 'tuple' object is not callable` が出ました。問題点を**2つ**指摘し、直してください（1つは Python の誤り、1つは化学的におかしい値です）。
+
+```python
+import pandas as pd
+
+oxides = pd.DataFrame({
+    "oxide":   ["Alumina", "Titania", "Zinc oxide", "Magnesia"],
+    "density": [3.95, 4.23, 56.1, 3.58],   # g/cm^3
+})
+print(oxides.shape())
+print(oxides["density"].describe())
+```
 
 ---
 
@@ -218,6 +246,36 @@ Name: density, dtype: float64
     50%       1.120000
     75%       1.270000
     max       1.420000
+    ```
+
+??? success "問4 の解答"
+    **誤り1（Python）**：`shape` はメソッドではなく**属性**なので `()` は付けません。`oxides.shape` はタプル `(4, 2)` で、それを `()` で呼ぼうとしたため `'tuple' object is not callable` になりました。
+
+    **誤り2（化学）**：酸化亜鉛（ZnO）の密度が `56.1` g/cm³ になっています。最も重い元素のオスミウムでも約 22.6 g/cm³ なので、あり得ない値です。正しくは **5.61**（小数点の位置の打ち間違い）。`describe()` の `max` を見れば気づけます（誤ったままだと max が 56.1、mean が 16.965 になります）。
+
+    ```python
+    import pandas as pd
+
+    oxides = pd.DataFrame({
+        "oxide":   ["Alumina", "Titania", "Zinc oxide", "Magnesia"],
+        "density": [3.95, 4.23, 5.61, 3.58],   # g/cm^3
+    })
+    print(oxides.shape)
+    print(oxides["density"].describe())
+    ```
+
+    出力:
+    ```text
+    (4, 2)
+    count    4.000000
+    mean     4.342500
+    std      0.885941
+    min      3.580000
+    25%      3.857500
+    50%      4.090000
+    75%      4.575000
+    max      5.610000
+    Name: density, dtype: float64
     ```
 
 ---

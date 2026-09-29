@@ -57,7 +57,7 @@ print("原子数:", mol.GetNumAtoms())  # 水素を除いた原子数
 原子数: 3
 ```
 
-`CCO` はエタノール $C_2H_6O$ の SMILES 表記。RDKit がそれを「分子」として理解し、原子数（C, C, O の3つ。水素は省略表示）を返しました。
+`CCO` はエタノール $C_2H_6O$ の SMILES 表記。RDKit がそれを「分子」として理解し、原子数（C, C, O の3つ）を返しました。`GetNumAtoms()` は既定では SMILES に書かれた原子だけを数え、省略された水素は数えません。水素も数えたいときは `Chem.AddHs(mol).GetNumAtoms()` を使います（第59回）。
 
 !!! note "SMILES とは"
     分子の構造を**文字列で表す記法**です（次回で詳しく）。`CCO`＝エタノール、`c1ccccc1`＝ベンゼン、のように、分子を1行のテキストで書けます。データベースやファイルでの分子のやり取りに使われます。
@@ -97,6 +97,22 @@ C C O O C C C C C C C O O
 
 ---
 
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    「Python と RDKit（2026年版）で、SMILES 文字列のリスト `["CCO", "c1ccccc1", ...]` を1つずつ `Chem.MolFromSmiles` で分子にし、
+    SMILES・重原子数・結合数を1行ずつ表示するコードを書いてください。
+    `MolFromSmiles` が `None` を返した SMILES はエラーで止めずに『無効』と表示して次へ進んでください。
+    原子数は水素を含まない数（`GetNumAtoms()`）であることをコメントに書いてください。」
+
+!!! warning "AIの出力で確かめること"
+    - `Chem.MolFromSmiles(...)` の直後に `if mol is None:` があるか。無いと、1つでも無効な SMILES（例：環が閉じていない `C1CCCC`）が混ざった時点で `AttributeError: 'NoneType' object has no attribute ...` で止まります。
+    - `GetNumAtoms()` の値を「水素を含む原子数」と説明していないか。エタノール `CCO` なら 3（重原子）で、水素込みは `Chem.AddHs(mol).GetNumAtoms()` の 9 です。
+    - 小さな既知分子で答え合わせする：`print(Chem.MolFromSmiles("CC(=O)Oc1ccccc1C(=O)O").GetNumAtoms())` がアスピリンの重原子数 13 になるか。
+    - `from rdkit import Chem` が書かれているか、古い記事由来の `from rdkit.Chem import AllChem as Chem` のような紛らわしい別名になっていないか。
+
+---
+
 ## 演習問題
 
 **問1.** RDKit を import し、メタン `C`、水 `O`、二酸化炭素 `O=C=O` の分子を作って、それぞれの重原子数（`GetNumAtoms()`）を表示してください。
@@ -104,6 +120,25 @@ C C O O C C C C C C C O O
 **問2.** ベンゼン `c1ccccc1` の分子を作り、原子数と結合数を表示してください。6員環なので、どちらも6になるはずです。
 
 **問3.** 存在しない出鱈目な SMILES（例：`"XYZ123"`）を `MolFromSmiles` に渡すとどうなるか確かめ、`if mol is None:` で「無効な SMILES です」と表示するコードを書いてください。
+
+**問4.** 次は AI が書いた「SMILES のリストから水素を含む原子数を表示する」コードです。問題点を指摘し、直してください。
+
+```python
+from rdkit import Chem
+
+smiles_list = ["CCO", "c1ccccc1", "C1CCCC", "CC(=O)O"]
+for smi in smiles_list:
+    mol = Chem.MolFromSmiles(smi)
+    print(smi, "の原子数（水素を含む）:", mol.GetNumAtoms())
+```
+
+AI の出力（途中で止まる）:
+
+```text
+CCO の原子数（水素を含む）: 3
+c1ccccc1 の原子数（水素を含む）: 6
+AttributeError: 'NoneType' object has no attribute 'GetNumAtoms'
+```
 
 ---
 
@@ -154,6 +189,34 @@ C C O O C C C C C C C O O
     無効な SMILES です
     ```
     （RDKit は警告メッセージも表示しますが、`None` チェックで安全に処理できます。）
+
+??? success "問4 の解答"
+    誤りは2つです。
+
+    1. **None チェックがない**：`C1CCCC` は環番号 `1` が閉じていない無効な SMILES なので、`MolFromSmiles` が `None` を返し、`None.GetNumAtoms()` で `AttributeError` になります。
+    2. **「水素を含む」は誤り**：`GetNumAtoms()` は SMILES に書かれた重原子だけを数えます。エタノールが 3 と表示された時点で「C2H6O なら水素込みで 9 のはず」と気づけます。水素込みは `Chem.AddHs(mol)` の後に数えます。
+
+    ```python
+    from rdkit import Chem
+
+    smiles_list = ["CCO", "c1ccccc1", "C1CCCC", "CC(=O)O"]
+    for smi in smiles_list:
+        mol = Chem.MolFromSmiles(smi)
+        if mol is None:
+            print(smi, "は無効な SMILES です（スキップ）")
+            continue
+        mol_h = Chem.AddHs(mol)
+        print(smi, "重原子:", mol.GetNumAtoms(), "／水素を含む:", mol_h.GetNumAtoms())
+    ```
+
+    出力:
+    ```text
+    CCO 重原子: 3 ／水素を含む: 9
+    c1ccccc1 重原子: 6 ／水素を含む: 12
+    C1CCCC は無効な SMILES です（スキップ）
+    CC(=O)O 重原子: 4 ／水素を含む: 8
+    ```
+    （RDKit の解析エラーのメッセージも表示されますが、処理は最後まで進みます。）
 
 ---
 

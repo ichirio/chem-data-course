@@ -10,7 +10,7 @@
 研究現場のデータは Excel で管理されていることが多いもの。pandas は Excel も CSV とほぼ同じ感覚で扱えます。
 
 !!! info "準備：openpyxl"
-    Excel を扱うには `openpyxl` が必要です（第1回の `conda install` 群に含めていなければ）。
+    Excel を扱うには `openpyxl` が必要です。第1回で入れたパッケージには含まれていないので、追加で入れます。
     ```bash
     conda install -c conda-forge openpyxl -y   # conda環境の人
     pip install openpyxl                        # venvの人
@@ -61,7 +61,7 @@ print("results.xlsx（2シート）を保存しました")
 `with ... as writer:` の中で、シート名を変えながら書き込みます。これで「polymers」「oxides」の2シートを持つ1ファイルができます。
 
 !!! note "`with` 構文について"
-    `with pd.ExcelWriter(...) as writer:` は「ファイルを開いて、ブロックを抜けたら自動で閉じる」書き方です。閉じ忘れによる書き込み失敗を防いでくれます（第12回で詳しく扱います）。
+    `with pd.ExcelWriter(...) as writer:` は「ファイルを開いて、ブロックを抜けたら自動で閉じる」書き方です。閉じ忘れによる書き込み失敗を防いでくれます（第12回で学んだ `with open(...) as f:` と同じ仕組みです）。
 
 ---
 
@@ -86,8 +86,8 @@ print(back)
 どんなシートがあるか調べたいときは `ExcelFile` を使います。
 
 ```python
-xls = pd.ExcelFile("results.xlsx")
-print(xls.sheet_names)
+with pd.ExcelFile("results.xlsx") as xls:
+    print(xls.sheet_names)
 ```
 
 出力:
@@ -122,6 +122,21 @@ print(xls.sheet_names)
 
 ---
 
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    pandas と openpyxl で、DataFrame `polymers`（polymer, tensile_MPa）を "poly" シート、`oxides`（oxide, density [g/cm³]）を "oxide" シートとして、1つのファイル `materials.xlsx` に保存してください。
+    `pd.ExcelWriter` を with 文で使い、index 列は書かないでください。
+    保存後にシート名の一覧を表示し、"oxide" シートを `sheet_name` を指定して読み直して表示してください。
+
+!!! warning "AIの出力で確かめること"
+    - `to_excel("同じファイル.xlsx", sheet_name=...)` を2回続けて呼んでいないか。2回目がファイルを**丸ごと上書き**するので、最後のシートしか残りません。`sheet_names` が `['poly', 'oxide']` の2つになっているかを確認します。
+    - `read_excel` に `sheet_name` を付け忘れていないか。付けないと**先頭のシートだけ**が読まれます。読んだ表の列名（`oxide`, `density` か）を print して確かめます。
+    - 読み込んだ表の `dtypes`。Excel 上で数値が文字列として入力されていたり、表の上に見出し行や単位の行があったりすると、数値列が `str` になります（`header=` や `skiprows=` で読む位置を指定します）。
+    - Excel の数式セル。openpyxl で作ったファイルの数式は計算結果が保存されていないので、pandas で読むと NaN になります。数式ではなく値が入っているかを確認します。
+
+---
+
 ## 演習問題
 
 **問1.** 本文の `polymers` を `polymers.xlsx` に保存し（`index=False`）、`read_excel` で読み直して表示してください。
@@ -129,6 +144,19 @@ print(xls.sheet_names)
 **問2.** `ExcelWriter` を使って、`polymers` を "poly" シート、`oxides` を "oxide" シートとして `materials.xlsx` に保存してください。そのあと `ExcelFile` でシート名一覧を表示しましょう。
 
 **問3.** 問2で作った `materials.xlsx` から、"oxide" シートだけを読み込んで表示してください。
+
+**問4.**（検証型）次は AI が「polymers を "poly" シート、oxides を "oxide" シートとして materials.xlsx に保存する」ために書いたコードとその出力です。シートが1つしかありません。問題点を指摘し、直してください。
+
+```python
+polymers.to_excel("materials.xlsx", sheet_name="poly", index=False)
+oxides.to_excel("materials.xlsx", sheet_name="oxide", index=False)
+print(pd.ExcelFile("materials.xlsx").sheet_names)
+```
+
+出力:
+```text
+['oxide']
+```
 
 ---
 
@@ -155,8 +183,8 @@ print(xls.sheet_names)
         polymers.to_excel(writer, sheet_name="poly", index=False)
         oxides.to_excel(writer, sheet_name="oxide", index=False)
 
-    xls = pd.ExcelFile("materials.xlsx")
-    print(xls.sheet_names)
+    with pd.ExcelFile("materials.xlsx") as xls:
+        print(xls.sheet_names)
     ```
 
     出力:
@@ -172,6 +200,29 @@ print(xls.sheet_names)
 
     出力:
     ```text
+       oxide  density
+    0  Al2O3     3.95
+    1   TiO2     4.23
+    ```
+
+??? success "問4 の解答"
+    **誤り**：ファイル名を渡した `to_excel` は、そのたびに**新しいファイルを作って上書き**します。2行目の `oxides.to_excel(...)` が1行目で作った "poly" シートごとファイルを上書きしたため、"oxide" シートしか残っていません。エラーは出ないので、`sheet_names` を表示して確かめることが大切です。
+
+    **直し方**：1つのファイルに複数シートを書くときは、`pd.ExcelWriter` を with 文で開き、その中で書き込みます。
+
+    ```python
+    with pd.ExcelWriter("materials.xlsx") as writer:
+        polymers.to_excel(writer, sheet_name="poly", index=False)
+        oxides.to_excel(writer, sheet_name="oxide", index=False)
+
+    with pd.ExcelFile("materials.xlsx") as xls:
+        print(xls.sheet_names)
+    print(pd.read_excel("materials.xlsx", sheet_name="oxide"))
+    ```
+
+    出力:
+    ```text
+    ['poly', 'oxide']
        oxide  density
     0  Al2O3     3.95
     1   TiO2     4.23

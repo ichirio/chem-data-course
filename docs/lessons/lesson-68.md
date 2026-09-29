@@ -40,7 +40,7 @@ C (Carbon): 原子番号 6, 原子量 12.011, 電気陰性度 2.55
 ```
 
 !!! note "取得できる主な性質"
-    `atomic_number`（原子番号）、`atomic_weight`（原子量）、`en_pauling`（ポーリングの電気陰性度）、`group_id`（族）、`period`（周期）、`atomic_radius`（原子半径）、`ionenergies`（イオン化エネルギー）など、非常に多くの性質があります。
+    `atomic_number`（原子番号）、`atomic_weight`（原子量）、`en_pauling`（ポーリングの電気陰性度）、`group_id`（族）、`period`（周期）、`atomic_radius`（原子半径）、`ionenergies`（イオン化エネルギー [eV] の辞書。第1イオン化エネルギーは `ionenergies[1]`）など、非常に多くの性質があります。
 
 ---
 
@@ -96,10 +96,25 @@ print("電気陰性度 最小:", df.loc[df["EN"].idxmin(), "name"], df["EN"].min
 電気陰性度 最小: Lithium 0.98
 ```
 
-フッ素が最も電気陰性度が高い（周期表右上ほど高い、という傾向）——教科書の周期的性質を、データで確認できました。
+フッ素が最も電気陰性度が高い（貴ガスを除き、周期表右上ほど高い、という傾向）——教科書の周期的性質を、データで確認できました。
 
 !!! success "教科書の法則をデータで再現"
     原子半径・イオン化エネルギー・電気陰性度の周期的変化は、mendeleev のデータと第4部・第5部を組み合わせれば、自分の手で可視化・確認できます。「なぜそうなるか」を、データを触りながら理解できるのが強みです。
+
+---
+
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    「mendeleev で第2周期（Li〜Ne）の元素について、記号・ポーリングの電気陰性度（`en_pauling`）・第1イオン化エネルギー [eV]（`ionenergies[1]`）を DataFrame にまとめてください。
+    値が None の元素（貴ガスの電気陰性度など）は NaN のまま残し、欠損の件数を print してください。
+    最大・最小は `idxmax` / `idxmin` で求め、どの元素かを表示してください。」
+
+!!! warning "AIの出力で確かめること"
+    - `ionenergies[0]` と書いていないか。mendeleev の `ionenergies` は**1始まりの辞書**（キー 1, 2, 3…）なので、`[0]` は `KeyError` です。
+    - 欠損（None → NaN）の扱い：`df["EN"].isna().sum()` を print。Ne・He などの電気陰性度は値がありません。`max()` に None を含むリストを渡すと `TypeError` になります。
+    - AI の「傾向の説明」を鵜呑みにしない：第2周期の第1イオン化エネルギーは Be > B、N > O の逆転があり、単調増加ではありません。表の値を上から読んで確かめます。
+    - 単位：イオン化エネルギーは eV（kJ/mol ではない）、原子半径 `atomic_radius` は pm。
 
 ---
 
@@ -110,6 +125,28 @@ print("電気陰性度 最小:", df.loc[df["EN"].idxmin(), "name"], df["EN"].min
 **問2.** アルカリ金属 `["Li", "Na", "K", "Rb"]` の原子量を DataFrame にまとめてください。
 
 **問3.** 第3周期 `["Na", "Mg", "Al", "Si", "P", "S", "Cl"]` の電気陰性度を DataFrame にまとめ、最大・最小の元素を `idxmax` / `idxmin` で表示してください。
+
+**問4.** 次は AI が書いた「第2周期の電気陰性度と第1イオン化エネルギーの表」を作るコードと、AI の説明です。問題点を指摘し、直してください。
+
+```python
+from mendeleev import element
+import pandas as pd
+
+rows = []
+for s in ["Li", "Be", "B", "C", "N", "O", "F", "Ne"]:
+    e = element(s)
+    rows.append({"symbol": s, "EN": e.en_pauling, "IE1_eV": e.ionenergies[0]})
+df = pd.DataFrame(rows)
+print(df.to_string(index=False))
+```
+
+AI の出力:
+
+```text
+KeyError: 0
+```
+
+AI の説明：「第2周期では、電気陰性度も第1イオン化エネルギーも、右へ行くほど単調に大きくなります。」
 
 ---
 
@@ -165,6 +202,43 @@ print("電気陰性度 最小:", df.loc[df["EN"].idxmin(), "name"], df["EN"].min
     ```text
     最大: Cl 3.16
     最小: Na 0.93
+    ```
+
+??? success "問4 の解答"
+    誤りは2つです。
+
+    1. **インデックスの誤り**：mendeleev の `ionenergies` は `{1: 第1, 2: 第2, ...}` という1始まりの辞書なので、`[0]` は `KeyError` です。第1イオン化エネルギーは `ionenergies[1]`。
+    2. **説明が化学的に誤り**：実際のデータでは第1イオン化エネルギーが Be（9.32 eV）> B（8.30 eV）、N（14.53 eV）> O（13.62 eV）と逆転します（2p 軌道への入り始め、2p の電子対形成のため）。また Ne の電気陰性度は値が無く（NaN）、「単調に大きくなる」とは言えません。
+
+    ```python
+    from mendeleev import element
+    import pandas as pd
+
+    rows = []
+    for s in ["Li", "Be", "B", "C", "N", "O", "F", "Ne"]:
+        e = element(s)
+        rows.append({"symbol": s, "EN": e.en_pauling, "IE1_eV": e.ionenergies[1]})  # 第1イオン化エネルギー
+    df = pd.DataFrame(rows)
+    print(df.to_string(index=False))
+    print("EN の欠損:", df["EN"].isna().sum(), "件")
+    print("EN 最大:", df.loc[df["EN"].idxmax(), "symbol"])
+    print("IE1 最大:", df.loc[df["IE1_eV"].idxmax(), "symbol"])
+    ```
+
+    出力:
+    ```text
+    symbol   EN    IE1_eV
+        Li 0.98  5.391715
+        Be 1.57  9.322699
+         B 2.04  8.298019
+         C 2.55 11.260288
+         N 3.04 14.534130
+         O 3.44 13.618055
+         F 3.98 17.422820
+        Ne  NaN 21.564541
+    EN の欠損: 1 件
+    EN 最大: F
+    IE1 最大: Ne
     ```
 
 ---

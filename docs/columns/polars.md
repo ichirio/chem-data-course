@@ -24,10 +24,10 @@
 
 ```bash
 # conda（Miniforge）を使っている場合
-conda install -c conda-forge polars
+conda install -c conda-forge polars pyarrow
 
 # pip の場合
-pip install polars
+pip install polars pyarrow
 ```
 
 ```python
@@ -272,20 +272,20 @@ shape: (3, 2)
 
 酵素アッセイのデータには欠損（空欄）があります。
 
-```python
-enzyme = pl.DataFrame({
-    "sample":        ["S1","S2","S3","S4","S5","S6"],
-    "substrate_mM":  [0.5, 1.0, 2.0, 4.0, 8.0, 16.0],
-    "absorbance":    [0.12, 0.21, 0.35, None, 0.58, 0.62],
-    "temperature_C": [25.0, 25.0, None, 25.0, 25.0, 25.0],
-})
-```
-
 === "pandas"
 
     ```python
-    # 欠損のある行を落とす
-    enzyme.dropna()
+    import pandas as pd
+
+    enzyme = pd.DataFrame({
+        "sample":        ["S1","S2","S3","S4","S5","S6"],
+        "substrate_mM":  [0.5, 1.0, 2.0, 4.0, 8.0, 16.0],
+        "absorbance":    [0.12, 0.21, 0.35, None, 0.58, 0.62],
+        "temperature_C": [25.0, 25.0, None, 25.0, 25.0, 25.0],
+    })
+
+    # 欠損のある行を落とす（結果を別の変数に受け取る）
+    enzyme_dropped = enzyme.dropna()
 
     # absorbance の欠損を平均で埋める
     enzyme["absorbance"] = enzyme["absorbance"].fillna(enzyme["absorbance"].mean().round(3))
@@ -294,22 +294,35 @@ enzyme = pl.DataFrame({
 === "Polars"
 
     ```python
-    # 欠損のある行を落とす
-    enzyme.drop_nulls()
+    import polars as pl
 
-    # absorbance の欠損を平均で埋める
-    enzyme.with_columns(
+    enzyme = pl.DataFrame({
+        "sample":        ["S1","S2","S3","S4","S5","S6"],
+        "substrate_mM":  [0.5, 1.0, 2.0, 4.0, 8.0, 16.0],
+        "absorbance":    [0.12, 0.21, 0.35, None, 0.58, 0.62],
+        "temperature_C": [25.0, 25.0, None, 25.0, 25.0, 25.0],
+    })
+
+    # 欠損のある行を落とす（結果を別の変数に受け取る）
+    enzyme_dropped = enzyme.drop_nulls()
+
+    # absorbance の欠損を平均で埋める（戻り値を受け取る）
+    enzyme_filled = enzyme.with_columns(
         pl.col("absorbance").fill_null(pl.col("absorbance").mean().round(3))
     )
+    print(enzyme_filled.select(["sample", "absorbance"]))
     ```
 
 `dropna → drop_nulls`、`fillna → fill_null`。名前の対応さえ掴めば移行はスムーズです。Polarsは欠損を **`null`** と呼び、`0/0` のような **`NaN`** とは別物として扱う点だけ意識しておきましょう。
 
-平均で埋めた結果（S4が平均 0.376 になる）:
+Polars で平均で埋めた結果（S4が平均 0.376 になる）:
 
 ```text
+shape: (6, 2)
 ┌────────┬────────────┐
 │ sample ┆ absorbance │
+│ ---    ┆ ---        │
+│ str    ┆ f64        │
 ╞════════╪════════════╡
 │ S1     ┆ 0.12       │
 │ S2     ┆ 0.21       │
@@ -339,7 +352,7 @@ result = (
 )
 ```
 
-何が嬉しいか：Polarsは「**最終的に必要なのは2列＋この条件だけ**」と分かるので、**CSVから必要な列・行だけを読む**（=読み込み量そのものを減らす）といった最適化を自動でやります。数GBのログ的データで効果が絶大です。pandasは「まず全部読んでから絞る」ので、この差が速度とメモリに直結します。
+何が嬉しいか：Polarsは「**最終的に必要なのは2列＋この条件だけ**」と分かるので、**CSVから必要な列・行だけを読む**（=読み込み量そのものを減らす）といった最適化を自動でやります。数GBのログ的データで効果が絶大です。pandasも `usecols` で読む列は絞れますが、行の条件は「まず読んでから絞る」しかないので、この差が速度とメモリに直結します。
 
 ### 3-2. 式（Expression）で複数列を一気に処理
 
@@ -368,6 +381,8 @@ pf = pl.from_pandas(pdf)
 # Polars → pandas（matplotlib / seaborn / scikit-learn へ渡すとき）
 pdf = pf.to_pandas()
 ```
+
+`to_pandas()` / `from_pandas()` による変換には **pyarrow** が必要です。入っていないと `ModuleNotFoundError: No module named 'pyarrow'` になるので、上のインストールで一緒に入れておきましょう。
 
 !!! tip "実務の型"
     「**巨大データの読み込み・結合・集計は Polars、図と機械学習は pandas**」。この橋渡しを覚えておけば、両方の良いとこ取りができます。
@@ -407,7 +422,7 @@ pdf = pf.to_pandas()
 !!! warning "pandasの癖のままだとハマる点"
     - **インデックスが無い**：Polarsに `df.index` はありません。行番号でなく **条件（filter）で選ぶ**のが基本。
     - **`.with_columns` は元を変えない**：pandasの `df["x"]=...` 感覚で「代入したのに変わらない」となりがち。**戻り値を受け取る**こと。
-    - **`groupby` は順不同**：表を安定させたいなら `.sort()` を付ける。
+    - **`group_by` の結果は順不同**：表を安定させたいなら `.sort()` を付ける（メソッド名も pandas の `groupby` ではなく `group_by`）。
     - **`null` と `NaN` は別物**：欠損は `null`。`fill_null` と `fill_nan` を取り違えない。
     - **メソッド名の違い**：`dropna→drop_nulls`、`fillna→fill_null`、`rename` の引数の渡し方など、細部が異なる。
 

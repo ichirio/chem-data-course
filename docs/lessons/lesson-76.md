@@ -121,7 +121,7 @@ ggplot(polymers, aes(x = density, y = tensile, color = category)) +
 ??? success "問1 の解答"
     ```r
     ggplot(cal, aes(x = conc, y = absb)) +
-      geom_line(color = "teal") +
+      geom_line(color = "darkcyan") +
       geom_point(size = 3) +
       labs(x = "Concentration (mM)", y = "Absorbance") +
       theme_minimal()

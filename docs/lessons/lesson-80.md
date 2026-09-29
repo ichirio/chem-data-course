@@ -48,7 +48,7 @@ mean of x mean of y
 
 - **p-value = 0.0001443** … 0.05 より遥かに小さい → **有意差あり**。「AとBの収率には差がある」と結論できます。
 - **t = 8.4427** … t統計量（大きいほど差が明確）。
-- **95% 信頼区間 3.03〜5.49** … 平均の差は約3〜5%の範囲。区間が0を含まない＝差がある。
+- **95% 信頼区間 3.03〜5.49** … 平均の差は約3.0〜5.5ポイント（収率の%どうしの差なので「ポイント」）。区間が0を含まない＝5%水準で有意、と対応します。
 - **mean of x = 89.56, mean of y = 85.30** … 各群の平均。A の方が高い。
 
 !!! note "Welch の t検定（既定）"
@@ -67,8 +67,8 @@ df <- tibble(
 )
 
 ggplot(df, aes(x = catalyst, y = yield, fill = catalyst)) +
-  geom_boxplot() +
-  geom_jitter(width = 0.1) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.1, height = 0) +
   labs(x = "Catalyst", y = "Yield (%)", title = "Yield: Catalyst A vs B") +
   theme_minimal() +
   theme(legend.position = "none")
@@ -77,6 +77,8 @@ ggplot(df, aes(x = catalyst, y = yield, fill = catalyst)) +
 生成される図:
 
 ![t検定の箱ひげ図](../images/lesson80_ttest.png)
+
+`geom_jitter(width = 0.1, height = 0)` は点を横方向だけ少しずらして重なりを避けます（`height = 0` を付けないと縦にもずれ、測定値が変わって見えてしまいます）。
 
 A の方が明らかに高い位置にあり、検定結果（有意差あり）と一致します。
 
@@ -93,7 +95,7 @@ t.test(A, B, alternative = "greater")
 ```
 
 !!! tip "検定の前提"
-    t検定は「データがおおよそ正規分布に従う」ことを前提とします。極端に歪んだデータや外れ値が多い場合は、ノンパラメトリック検定（`wilcox.test`）を検討します。まずは箱ひげ図で分布を見る習慣を。
+    t検定は「データがおおよそ正規分布に従う」ことを前提とします。極端に歪んだデータや外れ値が多い場合は、ノンパラメトリック検定（`wilcox.test`）を検討します。まずは箱ひげ図や個々の点で分布を見る習慣を（ただし n = 5 程度では分布の形はほとんど判断できないので、外れ値がないかの確認が主目的です）。
 
 ---
 
@@ -126,7 +128,7 @@ t.test(A, B, alternative = "greater")
     p値 ≈ 0.0000181 で、有意差あり。高温の方が収率が高いと言えます。
 
 ??? success "問2 の解答"
-    出力の "95 percent confidence interval" を見ます（この例では約 −10.65 〜 −6.55）。区間が0を含まず、すべて負なので「low の方が low−high で小さい＝high の方が高い」と読めます。平均の差はおよそ 6.55〜10.65% です。
+    出力の "95 percent confidence interval" を見ます（この例では −10.645764 〜 −6.554236）。これは「low の平均 − high の平均」の区間です。区間が0を含まず、すべて負なので「high の方が収率が高い」と読めます。平均の差はおよそ 6.6〜10.6 ポイントです。
 
 ??? success "問3 の解答"
     ```r

@@ -19,9 +19,10 @@
 
 | SMARTS | 探すもの |
 |---|---|
-| `C(=O)O` | カルボキシ基/エステルのカルボニル-O |
-| `[OH]` | 水酸基（-OH） |
-| `[NH2]` | 第一級アミノ基（-NH2） |
+| `[CX3](=O)[OX2H1]` | カルボキシ基（-COOH）。エステルには一致しない |
+| `C(=O)O` | -C(=O)O- 部分（カルボキシ基とエステルの両方に一致） |
+| `[OH]` | 水酸基（-OH。カルボン酸の OH にも一致） |
+| `[NH2]` | -NH2（第一級アミンのほか、アミド -CONH2 にも一致） |
 | `c1ccccc1` | ベンゼン環 |
 
 `Chem.MolFromSmarts()` でパターンを作ります。
@@ -35,13 +36,14 @@
 ```python
 from rdkit import Chem
 
-# 探すパターン：カルボキシ基（のカルボニル炭素-酸素）
-pattern = Chem.MolFromSmarts("C(=O)O")
+# 探すパターン：カルボキシ基 -C(=O)OH（エステルには一致しない）
+pattern = Chem.MolFromSmarts("[CX3](=O)[OX2H1]")
 
 molecules = {
     "ibuprofen": "CC(C)Cc1ccc(cc1)C(C)C(=O)O",   # カルボン酸あり
     "benzene":   "c1ccccc1",                       # なし
     "ethanol":   "CCO",                            # なし
+    "ethyl acetate": "CCOC(C)=O",                  # エステル（カルボン酸ではない）
 }
 
 for name, smi in molecules.items():
@@ -56,6 +58,7 @@ for name, smi in molecules.items():
 ibuprofen: カルボキシ基 あり
 benzene: カルボキシ基 なし
 ethanol: カルボキシ基 なし
+ethyl acetate: カルボキシ基 なし
 ```
 
 化合物ライブラリから「カルボン酸だけ」を選び出す、といった処理の基礎です。
@@ -64,25 +67,25 @@ ethanol: カルボキシ基 なし
 
 ## 3. どこに一致したかを調べる
 
-`GetSubstructMatches()` は、一致した**原子の番号**を返します。
+`GetSubstructMatches()` は、一致した**原子インデックス**（分子内の原子の通し番号。0 から始まる。元素の「原子番号」とは別物）を返します。
 
 ```python
 from rdkit import Chem
 
-pattern = Chem.MolFromSmarts("C(=O)O")
+pattern = Chem.MolFromSmarts("[CX3](=O)[OX2H1]")
 mol = Chem.MolFromSmiles("CC(C)Cc1ccc(cc1)C(C)C(=O)O")   # イブプロフェン
 
 matches = mol.GetSubstructMatches(pattern)
-print("一致した原子番号:", matches)
+print("一致した原子インデックス:", matches)
 ```
 
 出力:
 
 ```text
-一致した原子番号: ((12, 13, 14),)
+一致した原子インデックス: ((12, 13, 14),)
 ```
 
-原子番号 12・13・14 が、カルボキシ基に対応します。複数箇所あれば、タプルが複数返ります。
+原子インデックス 12・13・14 が、カルボキシ基に対応します。複数箇所あれば、タプルが複数返ります。
 
 ---
 
@@ -94,10 +97,10 @@ print("一致した原子番号:", matches)
 from rdkit import Chem
 from rdkit.Chem import Draw
 
-pattern = Chem.MolFromSmarts("C(=O)O")
+pattern = Chem.MolFromSmarts("[CX3](=O)[OX2H1]")
 mol = Chem.MolFromSmiles("CC(C)Cc1ccc(cc1)C(C)C(=O)O")
 
-hit = mol.GetSubstructMatch(pattern)       # 最初の一致（原子番号）
+hit = mol.GetSubstructMatch(pattern)       # 最初の一致（原子インデックス）
 img = Draw.MolToImage(mol, highlightAtoms=hit, size=(400, 300))
 img.save("substructure.png")
 print("保存しました")
@@ -114,13 +117,51 @@ print("保存しました")
 
 ---
 
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    「RDKit で、SMILES のリストから**カルボン酸（-COOH）だけ**を持つ化合物を選び、カルボキシ基の個数を数えてください。
+    SMARTS は `[CX3](=O)[OX2H1]` を使い、エステル（-COO-C）やカルボキシラート（-COO⁻）は数えないでください。
+    個数は `GetSubstructMatches` の結果の長さで数え、一致した原子インデックスも表示してください。
+    テスト用に、酢酸エチル（エステル）とアスピリン（エステルと酸を1つずつ）を含めてください。」
+
+!!! warning "AIの出力で確かめること"
+    - **SMARTS が狙いより広すぎないか**：`C(=O)O` はエステルにも一致します。酢酸エチル `CCOC(C)=O` で「なし」、アスピリンで「1個」になるかを必ず試します。
+    - 個数を `len(mol.GetSubstructMatch(patt))` で数えていないか。単数形の `GetSubstructMatch` は「最初の1か所の原子インデックス」を返すので、長さはパターンの原子数（3）になります。個数は `len(mol.GetSubstructMatches(patt))`。
+    - `MolFromSmarts` と `MolFromSmiles` を取り違えていないか。SMARTS の `[OX2H1]` などは `MolFromSmiles` では読めず `None` になります。
+    - 塩・イオン形（`C(=O)[O-]`）のデータでは `[OX2H1]` に一致しないので、データの形を先に確認します。
+
+---
+
 ## 演習問題
 
-**問1.** 水酸基パターン `[OH]` を作り、エタノール `CCO`・グルコース `OCC1OC(O)C(O)C(O)C1O`・ベンゼン `c1ccccc1` のそれぞれが水酸基を持つか判定してください。
+**問1.** 水酸基パターン `[OH]` を作り、エタノール `CCO`・グルコース `OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O`・ベンゼン `c1ccccc1` のそれぞれが水酸基を持つか判定してください。
 
 **問2.** ベンゼン環パターン `c1ccccc1` を作り、トルエン `Cc1ccccc1`・オクタン `CCCCCCCC`・アスピリン `CC(=O)Oc1ccccc1C(=O)O` が芳香環を持つか判定してください。
 
-**問3.** アミノ基パターン `[NH2]` を作り、グリシン `NCC(=O)O` が一致する原子番号を `GetSubstructMatches` で調べて表示してください。
+**問3.** アミノ基パターン `[NH2]` を作り、グリシン `NCC(=O)O` が一致する原子インデックスを `GetSubstructMatches` で調べて表示してください。
+
+**問4.** 次は AI が書いた「カルボキシ基の数を数える」コードです。3つとも同じ数になりました。問題点を指摘し、直してください。
+
+```python
+from rdkit import Chem
+
+patt = Chem.MolFromSmarts("C(=O)O")      # カルボキシ基のつもり
+for name, smi in [("aspirin", "CC(=O)Oc1ccccc1C(=O)O"),
+                  ("ethyl acetate", "CCOC(C)=O"),
+                  ("ibuprofen", "CC(C)Cc1ccc(cc1)C(C)C(=O)O")]:
+    mol = Chem.MolFromSmiles(smi)
+    n = len(mol.GetSubstructMatch(patt))
+    print(name, "カルボキシ基の数:", n)
+```
+
+AI の出力:
+
+```text
+aspirin カルボキシ基の数: 3
+ethyl acetate カルボキシ基の数: 3
+ibuprofen カルボキシ基の数: 3
+```
 
 ---
 
@@ -130,7 +171,7 @@ print("保存しました")
     ```python
     from rdkit import Chem
     patt = Chem.MolFromSmarts("[OH]")
-    for name, smi in [("ethanol", "CCO"), ("glucose", "OCC1OC(O)C(O)C(O)C1O"), ("benzene", "c1ccccc1")]:
+    for name, smi in [("ethanol", "CCO"), ("glucose", "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O"), ("benzene", "c1ccccc1")]:
         mol = Chem.MolFromSmiles(smi)
         print(name, mol.HasSubstructMatch(patt))
     ```
@@ -171,15 +212,40 @@ print("保存しました")
     ```text
     ((0,),)
     ```
-    原子番号0（先頭の窒素）がアミノ基に一致します。
+    原子インデックス 0（先頭の窒素）がアミノ基に一致します。
+
+??? success "問4 の解答"
+    誤りは2つです。
+
+    1. **数え方の誤り**：`GetSubstructMatch`（単数形）は最初の一致の原子インデックスのタプル（例 `(12, 13, 14)`）を返すので、その長さは常にパターンの原子数 3 です。個数は `GetSubstructMatches`（複数形）の長さで数えます。
+    2. **パターンが広すぎる**：`C(=O)O` はエステルの -C(=O)O- にも一致します。酢酸エチル（エステルのみ）にも一致してしまいます。-COOH だけなら `[CX3](=O)[OX2H1]`（O に H が1つ）。
+
+    ```python
+    from rdkit import Chem
+
+    patt = Chem.MolFromSmarts("[CX3](=O)[OX2H1]")   # -C(=O)OH だけに一致
+    for name, smi in [("aspirin", "CC(=O)Oc1ccccc1C(=O)O"),
+                      ("ethyl acetate", "CCOC(C)=O"),
+                      ("ibuprofen", "CC(C)Cc1ccc(cc1)C(C)C(=O)O")]:
+        mol = Chem.MolFromSmiles(smi)
+        matches = mol.GetSubstructMatches(patt)
+        print(name, "カルボキシ基の数:", len(matches), matches)
+    ```
+
+    出力:
+    ```text
+    aspirin カルボキシ基の数: 1 ((10, 11, 12),)
+    ethyl acetate カルボキシ基の数: 0 ()
+    ibuprofen カルボキシ基の数: 1 ((12, 13, 14),)
+    ```
 
 ---
 
 ## この回のまとめ
 
-- **SMARTS** は検索用の記法。`Chem.MolFromSmarts("C(=O)O")` でパターン作成。
+- **SMARTS** は検索用の記法。`Chem.MolFromSmarts("[CX3](=O)[OX2H1]")` のようにパターン作成（`C(=O)O` だとエステルにも一致する）。
 - `HasSubstructMatch(pattern)` で含むか判定（True/False）。
-- `GetSubstructMatches(pattern)` で一致した原子番号を取得。
+- `GetSubstructMatches(pattern)` で一致した原子インデックスを取得。
 - `Draw.MolToImage(mol, highlightAtoms=...)` で一致部分を強調表示。
 
 ### 次回予告

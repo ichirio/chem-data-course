@@ -90,8 +90,8 @@ polymers %>%
 # A tibble: 2 × 5
   category          n  mean    sd median
   <chr>         <int> <dbl> <dbl>  <dbl>
-1 thermoplastic     4  39.2 11.8     47.5
-2 thermoset         2  55    7.07    55  
+1 thermoplastic     4  39.2 11.8      40
+2 thermoset         2  55    7.07     55
 ```
 
 !!! note "平均と中央値の違い"

@@ -31,7 +31,7 @@ moles = mass_g / molar_mass
     - 定数（変えない値）… 大文字（`AVOGADRO`, `ATOMIC_MASS`）。
     - クラス … 先頭大文字（`Molecule`）。
 
-    化学の記号にならって `pH` のように書きたくなりますが、Python の慣習では変数は小文字始まりが基本です。
+    化学の記号にならって `pH` や `Ea` のように大文字を混ぜたくなりますが、Python の慣習（PEP 8）では変数名はすべて小文字の snake_case（`ph`, `ea_j_per_mol`）が基本です。ただし `pH` のように分野で定着した表記は、読みやすさを優先して使うこともあります（第11回）。どちらにするかはプロジェクト内で統一しましょう。
 
 ---
 
@@ -44,7 +44,7 @@ moles = mass_g / molar_mass
 molecules = moles * 6.022e23
 
 # 良い例：名前で意味が明確。値の変更も1か所で済む
-AVOGADRO = 6.022e23        # アボガドロ定数 [1/mol]
+AVOGADRO = 6.022e23        # アボガドロ定数 [1/mol]（定義値 6.02214076e23 を4桁に丸めた値）
 molecules = moles * AVOGADRO
 ```
 
@@ -58,8 +58,8 @@ molecules = moles * AVOGADRO
 # 悪いコメント：見れば分かることを書いている
 temperature = temperature + 273.15   # temperature に 273.15 を足す
 
-# 良いコメント：理由・背景を書いている
-temperature = temperature + 273.15   # 摂氏からケルビンへ（絶対温度が必要なため）
+# 良いコメント：理由・背景を書いている（変数名にも単位を入れる）
+temperature_K = temperature_C + 273.15   # 気体の状態方程式には絶対温度が必要なため
 
 # 良いコメント：注意点を残す
 yield_pct = measured / theoretical * 100   # theoretical は 0 でない前提（第10回の検証済み）
@@ -103,6 +103,22 @@ print(count_molecules(18.0, 18.015))
 
 ---
 
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    「次の関数を、動作を一切変えずに読みやすく書き直してください。
+    変数名は snake_case で、物理量には単位を名前に含めてください（例: `volume_L`, `temperature_K`）。
+    数値の定数は大文字の定数にして、単位と出典をコメントに書いてください。関数には docstring を付けてください。
+    書き直す前と後で、同じ入力に対して同じ結果が出ることを確かめるテスト用の print も付けてください。」
+
+!!! warning "AIの出力で確かめること"
+    - 「読みやすくする」だけのはずが、**計算結果が変わっていないか**。書き直し前と後で同じ入力を与え、出力が一致するか print して比べる。
+    - 定数の**値と、コメントに書いた単位が一致しているか**。例: 気体定数 8.314 は J/(mol·K)、0.082057 は L·atm/(mol·K)。コメントが「うそ」になっていないか。
+    - 温度が摂氏のまま絶対温度の式に入っていないか。変数名（`_C` / `_K`）と実際の計算が合っているか。
+    - コメントが「何をしているか」の言い換えだけになっていないか（「なぜ」が書かれているか）。
+
+---
+
 ## 演習問題
 
 **問1.** 次の読みにくいコードを、意味の分かる名前に直してください。
@@ -123,6 +139,24 @@ def g(c, v):
 ```
 （ヒント：モル濃度 c [mol/L] と体積 v [L] から物質量 [mol] を求めている）
 
+**問4.** 次は AI が「読みやすく書き直した」理想気体の圧力計算です。名前もコメントも docstring も整っていますが、1 mol・22.4 L・0 °C で 0.0 atm という結果になりました。問題点を2つ指摘し、直してください。
+```python
+GAS_CONSTANT = 8.314          # 気体定数 [L·atm/(mol·K)]
+
+def pressure_atm(moles, volume_L, temperature_C):
+    """理想気体の圧力 [atm] を返す"""
+    return moles * GAS_CONSTANT * temperature_C / volume_L
+
+print(pressure_atm(1.0, 22.4, 0))
+print(pressure_atm(1.0, 24.5, 25))
+```
+
+出力:
+```text
+0.0
+8.483673469387755
+```
+
 ---
 
 ## 解答
@@ -130,8 +164,8 @@ def g(c, v):
 ??? success "問1 の解答"
     ```python
     volume_L = 100
-    molar_volume = 22.4          # 標準状態の1molあたり体積 [L/mol]
-    moles = volume_L / molar_volume
+    MOLAR_VOLUME_L = 22.4        # 理想気体 1 mol の体積 [L/mol]（0 °C, 1.013×10^5 Pa）
+    moles = volume_L / MOLAR_VOLUME_L
     print(moles)
     ```
 
@@ -148,7 +182,7 @@ def g(c, v):
         """位置エネルギー [J] を返す"""
         return mass_kg * GRAVITY * height_m
 
-    print(potential_energy(2.0, 10.0))   # 196.2
+    print(f"{potential_energy(2.0, 10.0):.1f} J")   # 196.2 J
     ```
 
 ??? success "問3 の解答"
@@ -159,6 +193,33 @@ def g(c, v):
 
     print(moles_from_concentration(0.5, 2.0))   # 1.0
     ```
+
+??? success "問4 の解答"
+    **誤り1：定数の値とコメントの単位が合っていません。** 8.314 は J/(mol·K) の値です。L·atm/(mol·K) で計算するなら 0.082057 を使います。コメントが整っていても、**値と単位の対応**は自分で確かめる必要があります。
+
+    **誤り2：温度を摂氏のまま使っています。** 状態方程式 PV = nRT の T は絶対温度 [K] です。0 °C を 0 として掛けたため、圧力が 0 になりました。
+
+    **確かめ方：** 0 °C・1 mol・22.4 L なら約 1 atm になるはず、という既知の値と比べます。
+
+    ```python
+    GAS_CONSTANT_L_ATM = 0.082057   # 気体定数 [L·atm/(mol·K)]
+    ZERO_CELSIUS_K = 273.15         # 0 °C の絶対温度 [K]
+
+    def pressure_atm(moles, volume_L, temperature_C):
+        """理想気体の圧力 [atm] を返す（温度は摂氏で受け取り、内部でケルビンに換算）"""
+        temperature_K = temperature_C + ZERO_CELSIUS_K   # 気体の状態方程式は絶対温度が必要
+        return moles * GAS_CONSTANT_L_ATM * temperature_K / volume_L
+
+    print(f"{pressure_atm(1.0, 22.4, 0):.3f}")
+    print(f"{pressure_atm(1.0, 24.5, 25):.3f}")
+    ```
+
+    出力:
+    ```text
+    1.001
+    0.999
+    ```
+    どちらも約 1 atm になり、既知の値（0 °C で 22.4 L/mol、25 °C で約 24.5 L/mol）と整合します。
 
 ---
 

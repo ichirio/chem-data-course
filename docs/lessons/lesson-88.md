@@ -35,6 +35,8 @@ print(mol)
 
 `parse.smiles` は複数の SMILES をまとめて処理できるよう、**リスト**を返します。1つなら `[[1]]` で取り出します。
 
+`print(mol)` は `"Java-Object{AtomContainer(...)}"` という非常に長い文字列を表示するだけで、構造は読み取れません。中身の確認には、次節の分子式・分子量を使います。
+
 ---
 
 ## 2. 分子式・分子量を計算する
@@ -155,7 +157,7 @@ aspirin : C9H8O4 , MW = 180.16
     mol <- parse.smiles("XYZ")[[1]]
     is.null(mol)      # [1] TRUE
     ```
-    無効な SMILES では `NULL` が返ります。RDKit の `None` チェック（第56回）と同じ発想で、`is.null()` で確認できます。
+    無効な SMILES では `NULL` が返り、`1 out of 1 SMILES were not successfully parsed, resulting in NULLs.` という警告も表示されます。RDKit の `None` チェック（第56回）と同じ発想で、`is.null()` で確認できます。
 
 ---
 

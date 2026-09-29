@@ -1,5 +1,5 @@
 site_name: 化学データ分析コース（Python主・R副）
-site_description: 化学専攻の学生が、1回1テーマで初歩からPythonとRを学ぶ全100回コース
+site_description: 化学専攻の学生が、1回1テーマで初歩からPythonとRを学ぶ全105回コース（AIに指示し、確認する力を育てる）
 site_author: ichirio
 site_url: https://ichirio.github.io/chem-data-course/
 repo_url: https://github.com/ichirio/chem-data-course
@@ -64,7 +64,7 @@ plugins:
 
 nav:
   - はじめに: index.md
-  - ロードマップ（全100回）: roadmap.md
+  - ロードマップ（全105回）: roadmap.md
   - 第1部　はじめの一歩:
       - 第1回 開発環境の構築: lessons/lesson-01.md
       - 第2回 はじめてのPython: lessons/lesson-02.md

@@ -2,7 +2,7 @@
 
 !!! abstract "この回のゴール"
     - **tidyverse** と **パイプ `%>%`** を知る
-    - dplyr の5つの動詞（filter, select, mutate, arrange）を使う
+    - dplyr の4つの基本動詞（filter, select, mutate, arrange）を使う
     - データ整形を読みやすく書く
     - 所要時間の目安: 60分
     - 使うテーマ：**高分子（ポリマー）**の物性

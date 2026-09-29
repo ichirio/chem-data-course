@@ -22,12 +22,12 @@ print(log.dtypes)
 出力:
 
 ```text
-time           object
+time              str
 absorbance    float64
 dtype: object
 ```
 
-`time` の型は `object`（＝ただの文字列）です。このままでは時間の計算ができません。
+`time` の型は `str`（＝ただの文字列。pandas 2.x では `object` と表示）です。このままでは時間の計算ができません。
 
 ---
 
@@ -43,12 +43,12 @@ print(log.dtypes)
 出力:
 
 ```text
-time          datetime64[ns]
+time          datetime64[us]
 absorbance           float64
 dtype: object
 ```
 
-型が `datetime64[ns]` になりました。これで時間としての計算ができます。
+型が `datetime64[us]` になりました（`[us]` は時刻をマイクロ秒単位で持つという意味。pandas 2.x では `[ns]`＝ナノ秒と表示されます）。これで時間としての計算ができます。
 
 !!! tip "読み込み時に一発変換もできる"
     CSV から読むときは `parse_dates` を使うと、その場で日時型にできます。
@@ -108,13 +108,45 @@ print(log[["time", "absorbance", "elapsed_min"]])
 
 ---
 
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    pandas の DataFrame `log`（列: time は "2026-04-01 09:00" 形式の文字列、absorbance は吸光度）について、
+    time を `pd.to_datetime` で日時型に変換し、最初の測定からの**経過時間（分）**を elapsed_min 列として追加してください。
+    経過時間は「時刻の差 → `.dt.total_seconds()` → 60 で割る」で計算し、`.dt.minute` は使わないでください。
+    変換後の dtypes と、time・elapsed_min・absorbance の3列を表示してください。
+
+!!! warning "AIの出力で確かめること"
+    - `print(log.dtypes)` で time が `datetime64[...]` になっているか。`str`（pandas 2.x では `object`）のままなら、変換を代入し忘れています。
+    - 経過時間に `.dt.minute`（「時刻の分の部分」）を使っていないか。1時間を超えると 0, 30, 0, 30 のように**戻って**しまいます。経過時間は単調に増えるはずなので、`elapsed_min.is_monotonic_increasing` が True かを確認します。
+    - `astype(int)` で切り捨てていないか。秒まで記録されたデータだと 29.9 分が 29 分になります。必要なら `.round()` してから整数にします。
+    - 日付の書式。`"04/01/2026"` のような文字列は 4月1日とも 1月4日とも読めます。AI に `format="%Y-%m-%d %H:%M"` を明示させ、変換後の最初の行が意図した日時かを print で確かめます。
+
+---
+
 ## 演習問題
 
-**問1.** 本文の `log` を作り、`time` を日時型に変換してから `dtypes` を表示し、`datetime64[ns]` になっていることを確認してください。
+**問1.** 本文の `log` を作り、`time` を日時型に変換してから `dtypes` を表示し、`datetime64[us]`（pandas 2.x では `datetime64[ns]`）になっていることを確認してください。
 
 **問2.** `.dt` を使って、`time` から「時（hour）」の列だけを取り出して表示してください。
 
 **問3.** 反応開始からの経過時間を**分**で求め、`absorbance` と並べて表示してください（本文と同じ手順）。60分後の吸光度はいくつですか？
+
+**問4.**（検証型）次は AI が「反応開始からの経過時間（分）」を求めたコードとその出力です（`log["time"]` は日時型に変換済み）。問題点を指摘し、直してください。
+
+```python
+log["elapsed_min"] = log["time"].dt.minute - log["time"].dt.minute.iloc[0]
+print(log[["time", "elapsed_min", "absorbance"]])
+```
+
+出力:
+```text
+                 time  elapsed_min  absorbance
+0 2026-04-01 09:00:00            0        0.10
+1 2026-04-01 09:30:00           30        0.24
+2 2026-04-01 10:00:00            0        0.41
+3 2026-04-01 10:30:00           30        0.55
+```
 
 ---
 
@@ -133,7 +165,7 @@ print(log[["time", "absorbance", "elapsed_min"]])
 
     出力:
     ```text
-    time          datetime64[ns]
+    time          datetime64[us]
     absorbance           float64
     dtype: object
     ```
@@ -169,6 +201,27 @@ print(log[["time", "absorbance", "elapsed_min"]])
     ```
 
     → 60分後（elapsed_min = 60）の吸光度は **0.41** です。
+
+??? success "問4 の解答"
+    **誤り**：`.dt.minute` は「時刻のうち**分の部分**（0〜59）」を取り出すだけです。10:00 の分の部分は 0 なので、経過時間が 30 分から 0 分に**戻って**しまいました。
+
+    **確かめ方**：経過時間は時間とともに増え続けるはずです。吸光度は増えているのに経過時間が 0 に戻っている点で気づけます（`log["elapsed_min"].is_monotonic_increasing` が False になります）。
+
+    **直し方**：日時どうしを引き算して時間差にし、`.dt.total_seconds()` で秒にしてから 60 で割ります。
+
+    ```python
+    log["elapsed_min"] = (log["time"] - log["time"].iloc[0]).dt.total_seconds() / 60
+    print(log[["time", "elapsed_min", "absorbance"]])
+    ```
+
+    出力:
+    ```text
+                     time  elapsed_min  absorbance
+    0 2026-04-01 09:00:00          0.0        0.10
+    1 2026-04-01 09:30:00         30.0        0.24
+    2 2026-04-01 10:00:00         60.0        0.41
+    3 2026-04-01 10:30:00         90.0        0.55
+    ```
 
 ---
 

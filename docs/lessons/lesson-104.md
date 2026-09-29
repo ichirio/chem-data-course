@@ -61,11 +61,29 @@
 | **I**nteroperable（相互運用できる） | 標準的な形式（CSV等）で、他のツールでも使える |
 | **R**eusable（再利用できる） | ライセンス・説明が明確で、再利用しやすい |
 
+- **化合物は構造の識別子で**：名前（「アスピリン」「ASA」）は表記ゆれがあるので、SMILES・InChI・InChIKey や CAS 番号・PubChem CID の列を付けます（第57・65回）。RDKit なら `Chem.MolToInchiKey(mol)` で InChIKey を作れます。
 - **標準的な形式で**：独自形式より CSV など、誰でも開ける形式（第32回・第44回）。
 - **公開リポジトリ**：論文のデータは Zenodo・figshare 等で公開でき、DOI（永続的な識別子）が付きます。
+- **公開してよいかを先に確認**：未公開の実験データや共同研究先のデータは、指導教員の許可なしに公開リポジトリ（GitHub の public リポジトリを含む）に置きません。公開する場合は、ライセンス（例：CC BY 4.0）を README に書きます。
 
 !!! success "整ったデータは未来への投資"
     よく整理され、説明の付いたデータは、**あなた自身の次の研究**でも、**他の研究者**でも再利用できます。散らかったデータは、作った本人ですら使えなくなります。データ管理は、研究の生産性そのものを左右します。
+
+---
+
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    「`data/polymers.csv`（列 polymer, category, density [g/cm³], tensile_MPa, Tg_C）を読み、密度を kg/m³ に換算した表を作ってください。
+    生データ（data/ 以下）は絶対に上書きせず、結果は `results/polymers_density_kg_m3.csv` に `index=False` で保存してください。
+    列名には単位を残し、あわせて README 用の「各列の意味と単位」の表を Markdown で出力してください。」
+
+!!! warning "AIの出力で確かめること"
+    - **保存先**：`to_csv` のパスが `data/` の元ファイルと同じになっていないか。生データを上書きするコードは、実行する前に止める。
+    - **余計な列**：`to_csv` に `index=False` がないと、読み直したときに `Unnamed: 0` 列が増える。保存したファイルを `pd.read_csv` で読み直して列名を確認する。
+    - **単位と列名**：換算した列の名前に単位が入っているか（`density` のまま値だけ 1000 倍、は最悪の誤り）。換算の向き（×1000 か ÷1000 か）を1行で検算する（PE 0.94 g/cm³ → 940 kg/m³）。
+    - **README の中身**：AI が書いた列の説明・単位が、実際の列と1対1で合っているか。存在しない列や、推測で書いた測定条件が入っていないか。
+    - **送る前に**：AI にデータを貼る場合、未公開データでないか。列名と数行のダミーで足りないか。
 
 ---
 
@@ -76,6 +94,27 @@
 **問2.** 悪いファイル名（例：`データ 最新 (2)_final.xlsx`）を、良い名前に直してください。日付・内容・記号の使い方を意識しましょう。
 
 **問3.** これまでの学習で作った CSV ファイル1つについて、README を書いてください（何のデータか・各列の意味と単位・作成日）。
+
+**問4.** 次は、`data/polymers.csv` の密度を kg/m³ に換算して保存するために AI が書いたコードと出力です。問題点を2つ指摘し、直してください。
+
+```python
+import pandas as pd
+
+df = pd.read_csv("data/polymers.csv")
+df["density"] = df["density"] * 1000          # g/cm^3 → kg/m^3 に変換
+df = df.rename(columns={"density": "density_kg_m3"})
+df.to_csv("data/polymers.csv")                # 整えたデータを保存
+print(pd.read_csv("data/polymers.csv").head(3))
+```
+
+出力:
+
+```text
+   Unnamed: 0 polymer       category  density_kg_m3  tensile_MPa  Tg_C
+0           0      PE  thermoplastic          940.0           25  -110
+1           1      PP  thermoplastic          905.0           35   -10
+2           2      PS  thermoplastic         1050.0           45   100
+```
 
 ---
 
@@ -99,8 +138,41 @@
     - tensile_MPa: 引張強さ [MPa]
     - Tg_C: ガラス転移温度 [℃]
     出典：教材用の例示データ
+    作成者：（氏名）／密度・引張強さは室温での代表値
     ```
     列の意味と単位が明記されていれば、半年後でも安心して使えます。
+
+??? success "問4 の解答"
+    **誤り1（生データの上書き）**：読み込んだ `data/polymers.csv` と同じパスに保存しているので、**生データが消えました**。もう g/cm³ の元の値には戻せません（もう一度実行すると、さらに 1000 倍されて 940000 になります）。加工結果は `results/` など別の場所に、別の名前で保存します。
+
+    **誤り2（余計な列）**：`to_csv` に `index=False` がないため、行番号が `Unnamed: 0` という列として保存されています。
+
+    確かめ方：保存したファイルを読み直して列名を見る。実行前に、保存先のパスが読み込み元と同じでないか確認する。
+
+    ```python
+    from pathlib import Path
+    import pandas as pd
+
+    raw = pd.read_csv("data/polymers.csv")         # 生データは読むだけ
+    df = raw.copy()
+    df["density_kg_m3"] = df["density"] * 1000     # g/cm^3 → kg/m^3（単位を列名に残す）
+    df = df.drop(columns="density")
+
+    Path("results").mkdir(exist_ok=True)
+    df.to_csv("results/polymers_density_kg_m3.csv", index=False)   # 別名で保存、index 列は付けない
+    print(pd.read_csv("results/polymers_density_kg_m3.csv").head(3))
+    print("生データの列:", list(pd.read_csv("data/polymers.csv").columns))
+    ```
+
+    出力:
+    ```text
+      polymer       category  tensile_MPa  Tg_C  density_kg_m3
+    0      PE  thermoplastic           25  -110          940.0
+    1      PP  thermoplastic           35   -10          905.0
+    2      PS  thermoplastic           45   100         1050.0
+    生データの列: ['polymer', 'category', 'density', 'tensile_MPa', 'Tg_C']
+    ```
+    生データはそのまま残っています。念のため、生データのファイルは読み取り専用にしておくと安全です（§1）。
 
 ---
 

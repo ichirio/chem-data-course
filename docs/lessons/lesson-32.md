@@ -83,13 +83,14 @@ print(df.head())
 たった1行 `pd.read_csv("ファイル名")` で、テキストが「型つきの表」になりました。`density` は小数、`tensile_MPa` は整数、と自動で判別されています。
 
 !!! tip "ファイルの場所（パス）に注意"
-    `read_csv("polymers.csv")` は「**いま実行しているフォルダ**にある polymers.csv」を探します。見つからないとき（`FileNotFoundError`）は、ファイルとスクリプトが同じフォルダにあるか確認しましょう。別フォルダなら `pd.read_csv("data/polymers.csv")` のように相対パスで指定します。
+    `read_csv("polymers.csv")` は「**カレントディレクトリ（python を実行したときの作業フォルダ）**にある polymers.csv」を探します。これはスクリプトのあるフォルダと同じとは限りません。見つからないとき（`FileNotFoundError`）は、`import os; print(os.getcwd())` で作業フォルダを確認しましょう。別フォルダなら `pd.read_csv("data/polymers.csv")` のように相対パスで指定します。
 
 !!! note "日本語が含まれる CSV の文字コード"
     日本語列名や全角を含む CSV で文字化けするときは、文字コードの指定が必要です。
     ```python
     df = pd.read_csv("data.csv", encoding="utf-8")     # 多くはこれ
     df = pd.read_csv("data.csv", encoding="cp932")     # Excel(日本語Windows)由来はこちらのことも
+    df = pd.read_csv("data.csv", encoding="utf-8-sig") # Excel の「CSV UTF-8」保存（BOM付き）はこちら
     ```
 
 ---
@@ -112,6 +113,22 @@ print(df.describe())     # 数値列の要約
 
 ---
 
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    pandas で `data/polymers.csv`（列: polymer, category, density [g/cm³], tensile_MPa [MPa], Tg_C [℃]、UTF-8、1行目が列名）を読み込んでください。
+    読み込んだら shape・列名・dtypes を print し、Tg_C の平均を「℃」と明記して表示してください。
+    最後に、表を `polymers_copy.csv` に index 列を付けずに保存し、読み直して shape が変わらないことを確認するコードも付けてください。
+
+!!! warning "AIの出力で確かめること"
+    - 保存→読み直しで `shape` が `(9, 5)` のままか。`(9, 6)` になり、列名に `Unnamed: 0` があれば `to_csv` の `index=False` 忘れです。
+    - `print(df.dtypes)` で density が `float64`、tensile_MPa と Tg_C が `int64` か。数値列が `str` になっていたら、ファイル中に単位や `-`・空白などの文字が混じっています。
+    - 列名が `Tg_C` なのに、AI が表示で「K」と書いていないか。列名の単位と表示ラベルの単位が一致しているかを見ます。
+    - 列名の先頭に見えない文字（`'﻿polymer'` など）がないか、`print(list(df.columns))` で確認します。あれば `encoding="utf-8-sig"` で読み直します。
+    - `FileNotFoundError` のとき、AI にパスを推測で書き換えさせる前に `os.getcwd()` で作業フォルダを確認します。
+
+---
+
 ## 演習問題
 
 **問1.** 本文の `polymers` を作って `polymers.csv` に保存し（`index=False`）、そのあと `read_csv` で読み直して `head()` を表示してください。保存→読み込みの往復を体験しましょう。
@@ -119,6 +136,26 @@ print(df.describe())     # 数値列の要約
 **問2.** 読み込んだ `df` について、`shape`・列名・`dtypes` を表示してください。行数・列数はいくつですか？
 
 **問3.** 石油化学のデータを自分で作って保存・読み込みしてみましょう。原油の代表的な留分について `fraction`（留分名）・`bp_low_C`・`bp_high_C`（沸点範囲）の3列を持つ DataFrame を作り、`distillation.csv` に保存してから読み込んで表示してください。例：Naphtha 20〜150、Kerosene 150〜250、Diesel 250〜350。
+
+**問4.**（検証型）次は AI が書いた「CSV を保存して読み直し、ガラス転移点の平均を出す」コードとその出力です。問題点を**2つ**指摘し、直してください。
+
+```python
+import pandas as pd
+
+df = pd.read_csv("polymers.csv")
+df.to_csv("polymers_copy.csv")
+back = pd.read_csv("polymers_copy.csv")
+print(back.shape)
+print(list(back.columns))
+print("Tgの平均 [K]:", back["Tg_C"].mean().round(1))
+```
+
+出力:
+```text
+(9, 6)
+['Unnamed: 0', 'polymer', 'category', 'density', 'tensile_MPa', 'Tg_C']
+Tgの平均 [K]: 65.7
+```
 
 ---
 
@@ -152,8 +189,8 @@ print(df.describe())     # 数値列の要約
     ```text
     (9, 5)
     ['polymer', 'category', 'density', 'tensile_MPa', 'Tg_C']
-    polymer         object
-    category        object
+    polymer            str
+    category           str
     density        float64
     tensile_MPa      int64
     Tg_C             int64
@@ -183,6 +220,29 @@ print(df.describe())     # 数値列の要約
     0   Naphtha        20        150
     1  Kerosene       150        250
     2    Diesel       250        350
+    ```
+
+??? success "問4 の解答"
+    **誤り1（Python）**：`to_csv` に `index=False` が無いため、行番号が余分な列として保存され、読み直すと `Unnamed: 0` 列ができて 5列 → 6列に増えています。`shape` を保存前と比べれば気づけます。
+
+    **誤り2（単位）**：`Tg_C` は ℃ の列なのに、表示が「[K]」になっています。65.7 K（約 −207 ℃）は明らかに不自然です。単位は ℃ と表示するか、K にしたいなら 273.15 を足します（ケルビンでは 338.8 K）。
+
+    ```python
+    import pandas as pd
+
+    df = pd.read_csv("polymers.csv")
+    df.to_csv("polymers_copy.csv", index=False)
+    back = pd.read_csv("polymers_copy.csv")
+    print(back.shape)
+    print(list(back.columns))
+    print("Tgの平均 [℃]:", back["Tg_C"].mean().round(1))
+    ```
+
+    出力:
+    ```text
+    (9, 5)
+    ['polymer', 'category', 'density', 'tensile_MPa', 'Tg_C']
+    Tgの平均 [℃]: 65.7
     ```
 
 ---

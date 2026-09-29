@@ -11,6 +11,7 @@
 
 !!! info "Quarto について"
     Quarto は R Markdown の後継で、R でも Python でも使える文書システムです。第1回で入れた環境に含まれることが多く、なければ [quarto.org](https://quarto.org/) から導入します。VS Code の拡張でも使えます。
+    R のコードチャンクを実行するには、R 側に **knitr** と **rmarkdown** パッケージも必要です（`install.packages(c("knitr", "rmarkdown"))`）。`quarto check` で環境を確認できます。
 
 ---
 
@@ -22,7 +23,7 @@ Quarto 文書（`.qmd` ファイル）は、3つの要素でできています�
 2. **文章**（Markdown）… 見出し・説明文
 3. **コードチャンク**（\`\`\`{r} で囲む）… 実行される R コード
 
-```markdown
+````markdown
 ---
 title: "触媒スクリーニング報告書"
 author: "山田太郎"
@@ -52,7 +53,7 @@ ggplot(df, aes(catalyst, yield, fill = catalyst)) +
 ```
 
 以上より、Pd の収率が最も高かった。
-```
+````
 
 ---
 

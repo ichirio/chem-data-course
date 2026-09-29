@@ -18,7 +18,7 @@ polymers = pd.DataFrame({
     "tensile_MPa": [25, 35, 45, 52, 55, 70, 80, 60, 50],
 })
 
-# 生産者・価格の表（一部のポリマーだけ）
+# 生産者・価格の表（一部のポリマーだけ。社名・価格は架空）
 info = pd.DataFrame({
     "polymer":      ["PE", "PP", "PS", "PVC", "PET"],
     "producer":     ["A-chem", "B-poly", "C-mat", "A-chem", "D-fiber"],
@@ -121,6 +121,23 @@ print(combined)
 
 ---
 
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    pandas で、物性表 `polymers`（polymer, tensile_MPa の9行）と価格表 `info`（polymer, producer, price_yen_kg の5行）を polymer 列で結合してください。
+    物性表の行はすべて残し（how="left"）、価格が無いものは NaN のままにしてください。
+    結合前にキー列の前後の空白を除いて大文字にそろえ、`indicator=True` で「両方にあった／左だけ」の件数を表示してください。
+    キーが重複していたらエラーになるよう `validate="one_to_one"` も付けてください。
+
+!!! warning "AIの出力で確かめること"
+    - 結合後の行数。inner なら「両方にあるキーの数」、left なら左の表の行数（ここでは 9）になるはずです。`len()` で確認し、減っていたらキーの表記ゆれ（`"PS "` や `"pvc"`）を疑います。
+    - `indicator=True` の `_merge` 列を `value_counts()` し、`left_only` の中身が「本当に価格表に無いもの」かを確かめます。
+    - 行が**増えて**いないか。キーが片方の表で重複していると、行が掛け算で増えます。`validate="one_to_one"` を付ければ、重複があるときにエラーで止まります。
+    - `concat` の後に index が重複していないか（`ignore_index=True` の付け忘れ）。`df.index.is_unique` が True かを見ます。
+    - left 結合で欠損が入ると、整数の列（price_yen_kg）が `float64` になります（180 → 180.0）。表示が変わっても値は正しい、と分かっていれば慌てずに済みます。
+
+---
+
 ## 演習問題
 
 **問1.** `polymers` と `info` を `merge`（既定の inner）して、結合後の**行数**を `len()` で表示してください。なぜその行数になるか考えましょう。
@@ -128,6 +145,27 @@ print(combined)
 **問2.** `how="left"` で結合した表から、`producer` が欠損している（価格情報が無い）ポリマーだけを取り出して表示してください（ヒント：`merged_all["producer"].isna()`）。
 
 **問3.** 3つ目のバッチ `batch3 = {"sample": ["S5", "S6"], "yield_pct": [92.1, 89.9]}` を作り、`batch1`・`batch2`・`batch3` を `concat` で縦に1つにまとめて表示してください（`ignore_index=True`）。
+
+**問4.**（検証型）価格表が手入力で作られ、キー列に表記ゆれが入っていました。次は AI が書いた結合のコードとその出力です。価格表には5種類あるのに、結果は3種類しかありません。問題点を指摘し、直してください。
+
+```python
+info = pd.DataFrame({
+    "polymer":      ["PE", "PP", "PS ", "pvc", "PET"],
+    "price_yen_kg": [180, 210, 250, 160, 300],
+})
+merged = pd.merge(polymers, info, on="polymer")
+print(merged)
+print("価格つきポリマー:", len(merged), "種")
+```
+
+出力:
+```text
+  polymer  tensile_MPa  price_yen_kg
+0      PE           25           180
+1      PP           35           210
+2     PET           55           300
+価格つきポリマー: 3 種
+```
 
 ---
 
@@ -181,6 +219,38 @@ print(combined)
     4     S5       92.1
     5     S6       89.9
     ```
+
+??? success "問4 の解答"
+    **誤り**：キー列の値がそろっていません。`"PS "`（後ろに空白）と `"pvc"`（小文字）は、`polymers` 側の `"PS"`・`"PVC"` と別の文字列として扱われ、inner 結合で**エラーも出ずに**落ちました。
+
+    **確かめ方**：結合前後の件数を比べます。`how="left", indicator=True` で結合して `_merge` 列を数えると、どれが一致しなかったか分かります。
+
+    **直し方**：結合前にキー列を `.str.strip().str.upper()` でそろえます。キーの重複もチェックするなら `validate="one_to_one"` を付けます。
+
+    ```python
+    info["polymer"] = info["polymer"].str.strip().str.upper()
+    check = pd.merge(polymers, info, on="polymer", how="left", indicator=True)
+    print(check["_merge"].value_counts())
+    merged = pd.merge(polymers, info, on="polymer", validate="one_to_one")
+    print(merged)
+    ```
+
+    出力:
+    ```text
+    _merge
+    both          5
+    left_only     4
+    right_only    0
+    Name: count, dtype: int64
+      polymer  tensile_MPa  price_yen_kg
+    0      PE           25           180
+    1      PP           35           210
+    2      PS           45           250
+    3     PVC           52           160
+    4     PET           55           300
+    ```
+
+    `left_only` の4件は PMMA・Nylon6・Epoxy・Phenolic で、もともと価格表に無いものです。
 
 ---
 

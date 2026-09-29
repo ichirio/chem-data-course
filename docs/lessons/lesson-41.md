@@ -99,8 +99,8 @@ print(df.dtypes)
 1     S2    Water   91.2
 2     S3  Ethanol    NaN
 3     S4  Ethanol   85.7
-sample      object
-solvent     object
+sample         str
+solvent        str
 yield      float64
 dtype: object
 ```
@@ -113,6 +113,21 @@ dtype: object
 
 ---
 
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    手入力の実験記録 `raw`（列: "Sample "（前後に空白あり）, Solvent（Water/water/ETHANOL など表記ゆれ）, yield（収率 % の文字列。"not measured" や "85,7" のような小数点カンマが混じる））を前処理してください。
+    手順は ①列名の strip と小文字化 ②sample は strip＋大文字、solvent は strip＋title ③yield は strip し、カンマを小数点に置き換えてから `pd.to_numeric(errors="coerce")` で数値化。
+    ③の後に「NaN になった元の文字列」の一覧を print して、数値化で失われた値が無いか確認できるようにしてください。
+
+!!! warning "AIの出力で確かめること"
+    - `errors="coerce"` は数値にできない値を**黙って** NaN にします。「本当に測定していない値」だけが NaN になったかを、元の文字列と並べて確認します（`raw.loc[num.isna(), "yield"]`）。`"85,7"`（小数点カンマ）や `"88.5%"` まで NaN になっていたら前処理が足りません。
+    - 処理後の `print(df.dtypes)` で yield が `float64` になっているか。`str`（pandas 2.x では `object`）のままなら数値化されていません。
+    - `df["solvent"].unique().tolist()` で表記がそろったかを見ます。`"EtOH"` や `"エタノール"` のような別表記は `.str.title()` では統一されないので、対応表（`replace({"Etoh": "Ethanol"})` など）が必要です。
+    - 列名を小文字にした後で、AI が元の列名（`"Sample "`, `"Solvent"`）を使い続けていないか。`KeyError` の原因になります。
+
+---
+
 ## 演習問題
 
 **問1.** 本文の `raw` を作り、レシピ1で列名を整えた後の列名一覧を表示してください。
@@ -120,6 +135,28 @@ dtype: object
 **問2.** レシピ2まで行い、`solvent` 列に何種類の溶媒があるか `nunique()` で数えてください（表記をそろえた結果、2種類になるはずです）。
 
 **問3.** レシピ3まで行い、`yield` 列の**平均**（NaN は自動でスキップ）を小数第2位まで表示してください。
+
+**問4.**（検証型）別の実験記録の収率を数値化するため、AI が次のコードを書きました。平均収率は出ましたが、問題があります。どこがおかしいか指摘し、直してください。
+
+```python
+raw = pd.DataFrame({
+    "sample": ["S1", "S2", "S3", "S4"],
+    "yield":  ["88.5", " 91.2", "85,7", "not measured"],
+})
+raw["yield"] = pd.to_numeric(raw["yield"], errors="coerce")
+print(raw)
+print("平均収率:", round(raw["yield"].mean(), 2))
+```
+
+出力:
+```text
+  sample  yield
+0     S1   88.5
+1     S2   91.2
+2     S3    NaN
+3     S4    NaN
+平均収率: 89.85
+```
 
 ---
 
@@ -141,13 +178,13 @@ dtype: object
     ```python
     df["solvent"] = df["solvent"].str.strip().str.title()
     print("溶媒の種類数:", df["solvent"].nunique())
-    print(df["solvent"].unique())
+    print(df["solvent"].unique().tolist())
     ```
 
     出力:
     ```text
     溶媒の種類数: 2
-    ['Water' 'Ethanol']
+    ['Water', 'Ethanol']
     ```
 
 ??? success "問3 の解答"
@@ -162,6 +199,35 @@ dtype: object
     ```
 
     （88.5, 91.2, 85.7 の平均。NaN の行は除かれています。）
+
+??? success "問4 の解答"
+    **誤り**：S3 の `"85,7"` は小数点がカンマで書かれた 85.7% ですが、`errors="coerce"` によって**エラーも警告も出ずに** NaN にされました。その結果、測定済みの値が1つ消えて、平均が 2点だけ（89.85）で計算されています。
+
+    **確かめ方**：NaN になった行の**元の文字列**を表示し、「未測定」以外が含まれていないかを見ます。
+
+    **直し方**：数値化の前に、前後の空白を除き、カンマを小数点に置き換えます。
+
+    ```python
+    cleaned = raw["yield"].str.strip().str.replace(",", ".")
+    num = pd.to_numeric(cleaned, errors="coerce")
+    print("NaNになった元の値:", raw.loc[num.isna(), "yield"].tolist())
+    raw["yield"] = num
+    print(raw)
+    print("平均収率:", round(raw["yield"].mean(), 2))
+    ```
+
+    出力:
+    ```text
+    NaNになった元の値: ['not measured']
+      sample  yield
+    0     S1   88.5
+    1     S2   91.2
+    2     S3   85.7
+    3     S4    NaN
+    平均収率: 88.47
+    ```
+
+    （この修正版は、問題文の `raw = pd.DataFrame(...)` を作り直してから実行します。）
 
 ---
 

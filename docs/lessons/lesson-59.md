@@ -42,7 +42,7 @@ print("厳密質量:", round(Descriptors.ExactMolWt(mol), 4))
 
 !!! note "分子量と厳密質量の違い"
     - **分子量（MolWt）**… 各元素の**平均原子量**を使う。化学量論の計算に。
-    - **厳密質量（ExactMolWt）**… 各元素の**最も多い同位体**の質量を使う。**質量分析（MS）**でピークを同定するときに必須。
+    - **厳密質量（ExactMolWt）**… 各元素の**最も多い同位体**の質量を使う。**質量分析（MS）**でピークを同定するときに必須。ただし ESI などで実際に観測されるのは [M+H]⁺（＋1.0073）や [M+Na]⁺（＋22.9892）などのイオンなので、厳密質量にその分を足して比べます。
 
     分野によって使う値が違うので、両方あることを覚えておきましょう。
 
@@ -106,13 +106,49 @@ Counter({'H': 6, 'C': 2, 'O': 1})
 
 ---
 
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    「RDKit で、カフェイン（SMILES `CN1C=NC2=C1C(=O)N(C(=O)N2C)C`）の 0.0500 mol/L 水溶液を 250 mL 調製するのに必要な質量 [g] を計算してください。
+    モル質量は平均原子量による分子量（`Descriptors.MolWt`、単位 g/mol）を使い、体積は mL から L に換算してください。
+    分子式・モル質量・質量を、それぞれ単位付きで表示してください。」
+
+!!! warning "AIの出力で確かめること"
+    - **MolWt と ExactMolWt の使い分け**：秤量・濃度計算には平均原子量の `MolWt`、質量分析のピーク照合には `ExactMolWt`。コード中でどちらを使っているか、関数名を目で確認します。
+    - 分子式を表示させ、名前から期待される式と一致するか（カフェインなら C8H10N4O2、MW 194.19）。
+    - 単位換算：mL のまま掛けていないか。「0.05 mol/L × 0.25 L × 194 g/mol ≒ 2.4 g」と暗算で桁を確かめます。
+    - 塩や水和物（例：`.O` や `[Na+]` を含む SMILES）の場合、MolWt がどの形の質量か（塩込みか、遊離体か）を確認します。
+
+---
+
 ## 演習問題
 
-**問1.** グルコース `OCC1OC(O)C(O)C(O)C1O` の分子式・分子量・厳密質量を表示してください（分子式は $C_6H_{12}O_6$ になるはずです）。
+**問1.** グルコース `OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O` の分子式・分子量・厳密質量を表示してください（分子式は $C_6H_{12}O_6$ になるはずです）。
 
 **問2.** イブプロフェン `CC(C)Cc1ccc(cc1)C(C)C(=O)O`、パラセタモール `CC(=O)Nc1ccc(O)cc1` の分子式と分子量をまとめて表示してください。
 
 **問3.** カフェイン `CN1C=NC2=C1C(=O)N(C(=O)N2C)C` の元素組成を、`AddHs` と `Counter` で数えてください（窒素 N が4個含まれているはずです）。
+
+**問4.** 次は AI が書いた「カフェインの 0.0500 mol/L 水溶液を 250 mL 調製するのに必要な質量」を求めるコードです。問題点を指摘し、直してください。
+
+```python
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+
+# カフェインの 0.0500 mol/L 水溶液を 250 mL 調製するのに必要な質量
+mol = Chem.MolFromSmiles("CN1C=NC2=C1C(=O)N(C(=O)N2C)C")
+M = Descriptors.ExactMolWt(mol)      # g/mol
+c = 0.0500                           # mol/L
+V = 250                              # mL
+mass = c * V * M
+print(f"必要な質量: {mass:.3f} g")
+```
+
+AI の出力:
+
+```text
+必要な質量: 2426.005 g
+```
 
 ---
 
@@ -122,7 +158,7 @@ Counter({'H': 6, 'C': 2, 'O': 1})
     ```python
     from rdkit import Chem
     from rdkit.Chem import Descriptors, rdMolDescriptors
-    mol = Chem.MolFromSmiles("OCC1OC(O)C(O)C(O)C1O")
+    mol = Chem.MolFromSmiles("OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O")
     print("分子式:", rdMolDescriptors.CalcMolFormula(mol))
     print("分子量:", round(Descriptors.MolWt(mol), 2))
     print("厳密質量:", round(Descriptors.ExactMolWt(mol), 4))
@@ -165,6 +201,31 @@ Counter({'H': 6, 'C': 2, 'O': 1})
     Counter({'H': 10, 'C': 8, 'N': 4, 'O': 2})
     ```
     カフェイン $C_8H_{10}N_4O_2$。窒素が4個含まれています。
+
+??? success "問4 の解答"
+    誤りは2つです。
+
+    1. **単位換算の漏れ**：濃度が mol/L なのに体積を mL のまま掛けています。2.4 kg という答えは、暗算（0.05 × 0.25 × 194 ≒ 2.4 g）と 1000 倍ずれています。`V = 250 / 1000`（L）にします。
+    2. **ExactMolWt の誤用**：秤量に使うモル質量は平均原子量による `MolWt`（194.19）です。`ExactMolWt`（194.0804、最も多い同位体だけの質量）は質量分析用です。
+
+    ```python
+    from rdkit import Chem
+    from rdkit.Chem import Descriptors
+
+    mol = Chem.MolFromSmiles("CN1C=NC2=C1C(=O)N(C(=O)N2C)C")
+    M = Descriptors.MolWt(mol)           # 平均原子量による分子量 [g/mol]
+    c = 0.0500                           # mol/L
+    V = 250 / 1000                       # mL → L
+    mass = c * V * M
+    print(f"M = {M:.2f} g/mol")
+    print(f"必要な質量: {mass:.3f} g")
+    ```
+
+    出力:
+    ```text
+    M = 194.19 g/mol
+    必要な質量: 2.427 g
+    ```
 
 ---
 

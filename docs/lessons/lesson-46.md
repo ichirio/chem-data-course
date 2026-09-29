@@ -11,7 +11,7 @@
     第4部で「集計・テーブル」ができました。第5部では、それを**グラフ**にします。数字の羅列より、1枚の図のほうが桁違いに伝わります。
 
 !!! note "グラフのラベルは英語で書きます"
-    matplotlib は初期設定だと日本語が文字化け（□□□）します。本コースでは**軸やタイトルは英語**で書きます（英語表記は論文でも標準）。日本語を使いたい場合は `japanize-matplotlib` などの追加設定が必要です（発展）。
+    matplotlib の既定フォント（DejaVu Sans）には日本語の文字がないため、日本語は □□□ に化け、`Glyph ... missing from font(s) DejaVu Sans.` という警告が出ます。本コースでは**軸やタイトルは英語**で書きます（英語表記は論文でも標準）。日本語を使いたい場合のフォント設定は[第54回](lesson-54.md)の「日本語を使いたいとき」を参照してください。なお `°C` の記号は英語フォントでも表示できるので、`"Temperature (°C)"` と書いて構いません。
 
 `lesson46.py` を作りましょう。
 
@@ -72,27 +72,66 @@ plt.show()                                        # 画面に表示
 
 ---
 
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    「KNO3 の溶解度データを matplotlib の pyplot で折れ線グラフにしてください。
+    データは Python のリストで、`temp = [0, 20, 40, 60, 80, 100]`（温度 °C）、`solubility = [13, 32, 64, 110, 169, 246]`（g / 100 g 水）です。
+    x 軸を温度、y 軸を溶解度とし、軸ラベルは英語で単位つき（例: `Temperature (°C)`）、各点にマーカーをつけてください。
+    `solubility.png`（dpi=100）に保存してから画面に表示してください。」
+
+!!! warning "AIの出力で確かめること"
+    - `plt.plot(x, y)` は**1つ目が横軸**です。横軸の目盛りが 0〜100（温度）、縦軸が 0〜250（溶解度）になっているか。`print(plt.gca().get_xlim())` で横軸の範囲が約 −5〜105 なら正しく、約 1〜258 なら x と y が入れ替わっています。
+    - 軸ラベルに**量と単位の両方**があるか。溶解度の単位は「g / 100 g 水」で、`g/L` や `mol/L` と書かれていたら誤りです。
+    - `plt.savefig()` が `plt.show()` より**前**にあるか。保存された PNG を実際に開き、空白の画像でないか確かめる。
+    - 日本語のラベルが混ざっていたら、□□□ になっていないか、`Glyph ... missing from font(s) DejaVu Sans.` の警告が出ていないかを見る。
+
+---
+
 ## 演習問題
 
 **問1.** 本文のコードを実行し、`solubility.png` が保存され、折れ線グラフが表示されることを確認してください。
 
-**問2.** 別の物質のデータでグラフを描いてみましょう。塩化ナトリウム NaCl の溶解度はほぼ一定です。`temp = [0, 20, 40, 60, 80, 100]`、`solubility = [35.7, 36.0, 36.6, 37.3, 38.4, 39.8]` で折れ線グラフを描き、軸ラベルとタイトルをつけてください。KNO3 と比べて、線の形はどう違いますか？
+**問2.** 別の物質のデータでグラフを描いてみましょう。塩化ナトリウム NaCl の溶解度はほぼ一定です。`temp = [0, 20, 40, 60, 80, 100]`、`solubility = [35.7, 35.8, 36.3, 37.1, 38.0, 39.3]` で折れ線グラフを描き、軸ラベルとタイトルをつけてください。KNO3 と比べて、線の形はどう違いますか？
 
 **問3.** 問2のグラフの線の色を変え（例：`color="crimson"`）、マーカーを四角（`marker="s"`）にして、`nacl.png` という名前で保存してください。
+
+**問4.** 次は AI が書いたコードです。KNO3 の溶解度曲線（横軸が温度）を描いて `kno3.png` に保存するつもりですが、問題が2つあります。指摘して直してください。
+```python
+import matplotlib.pyplot as plt
+
+temp = [0, 20, 40, 60, 80, 100]            # 温度 [°C]
+solubility = [13, 32, 64, 110, 169, 246]   # 溶解度 [g / 100 g 水]
+
+plt.figure(figsize=(6, 4))
+plt.plot(solubility, temp, marker="o")
+plt.xlabel("Temperature (°C)")
+plt.ylabel("Solubility (g / 100 g water)")
+plt.tight_layout()
+xmin, xmax = plt.gca().get_xlim()
+print(f"x軸の範囲: {xmin:.1f} 〜 {xmax:.1f}")
+plt.show()
+plt.savefig("kno3.png", dpi=100)
+```
+
+出力:
+```text
+x軸の範囲: 1.3 〜 257.6
+```
 
 ---
 
 ## 解答
 
 ??? success "問1 の解答・確認ポイント"
-    本文のコードをそのまま実行します。ウィンドウにグラフが出て、スクリプトと同じフォルダに `solubility.png` ができていれば成功です。表示されない場合は、`plt.show()` を書いたか確認しましょう。
+    本文のコードをそのまま実行します。ウィンドウにグラフが出て、スクリプトと同じフォルダに `solubility.png` ができていれば成功です。表示されない場合は、`plt.show()` を書いたか確認しましょう。Ubuntu のサーバーや画面のない WSL では `plt.show()` を書いても何も表示されないことがあります。その場合も `solubility.png` を開けば結果を確認できます。
 
 ??? success "問2 の解答"
     ```python
     import matplotlib.pyplot as plt
 
     temp = [0, 20, 40, 60, 80, 100]
-    solubility = [35.7, 36.0, 36.6, 37.3, 38.4, 39.8]
+    solubility = [35.7, 35.8, 36.3, 37.1, 38.0, 39.3]
 
     plt.figure(figsize=(6, 4))
     plt.plot(temp, solubility, marker="o", color="teal")
@@ -117,6 +156,34 @@ plt.show()                                        # 画面に表示
     plt.savefig("nacl.png", dpi=100)
     plt.show()
     ```
+
+??? success "問4 の解答"
+    **誤り1：x と y が逆。** `plt.plot(solubility, temp)` は「横軸＝溶解度、縦軸＝温度」になり、軸ラベルと中身が食い違います。温度は 0〜100 °C なのに、横軸の範囲が 1.3〜257.6 になっていることから分かります。`plt.plot(x, y)` の**1つ目が横軸**です。
+
+    **誤り2：`savefig` が `show` の後。** 画面表示のウィンドウを閉じた後に保存すると、空の画像が保存されることがあります。保存は表示の前に行います。
+
+    ```python
+    import matplotlib.pyplot as plt
+
+    temp = [0, 20, 40, 60, 80, 100]            # 温度 [°C]
+    solubility = [13, 32, 64, 110, 169, 246]   # 溶解度 [g / 100 g 水]
+
+    plt.figure(figsize=(6, 4))
+    plt.plot(temp, solubility, marker="o")     # plot(x, y)：x=温度, y=溶解度
+    plt.xlabel("Temperature (°C)")
+    plt.ylabel("Solubility (g / 100 g water)")
+    plt.tight_layout()
+    plt.savefig("kno3.png", dpi=100)           # show より前に保存
+    xmin, xmax = plt.gca().get_xlim()
+    print(f"x軸の範囲: {xmin:.1f} 〜 {xmax:.1f}")
+    plt.show()
+    ```
+
+    出力:
+    ```text
+    x軸の範囲: -5.0 〜 105.0
+    ```
+    横軸が温度の範囲（0〜100 °C に少し余白）になりました。グラフは「軸ラベル」と「目盛りの数値の範囲」が合っているかを、必ずセットで確認しましょう。
 
 ---
 

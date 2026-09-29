@@ -68,7 +68,7 @@ x=5 の予測: 9.9
 R^2: 0.9992
 ```
 
-`fit` で学習し、`predict` で予測、`score` で当てはまりの良さ（回帰なら R²）を確認できました。
+`fit` で学習し、`predict` で予測、`score` で当てはまりの良さ（回帰なら R²）を確認できました。ただし、ここでの R² は**学習に使ったデータ自身**での値です。未知のデータでの実力の測り方は第95回で学びます。
 
 !!! warning "X は「2次元」にする"
     scikit-learn では、入力 X は **`[[1], [2], [3]]` の形（行＝サンプル、列＝特徴量）**にします。1次元の `[1, 2, 3]` はエラーになります。`np.array([...]).reshape(-1, 1)` で2次元にできます。
@@ -93,7 +93,24 @@ model.predict(新しいX)
 ```
 
 !!! success "1つ覚えれば応用が利く"
-    `fit` / `predict` / `score` の型は、scikit-learn の**すべてのモデルで共通**です。だから、線形回帰を覚えれば、決定木もランダムフォレストもサポートベクターマシンも、ほぼ同じ書き方で試せます。第93回以降、いろいろなモデルをこの型で使っていきます。
+    `fit` / `predict` / `score` の型は、scikit-learn の**教師あり学習のモデルで共通**です（標準化や PCA のような「変換器」は `fit` / `transform` の型、第97・98回）。だから、線形回帰を覚えれば、決定木もランダムフォレストもサポートベクターマシンも、ほぼ同じ書き方で試せます。第93回以降、いろいろなモデルをこの型で使っていきます。
+
+---
+
+## AIに任せるときの指示と確認
+
+!!! example "AIへの頼み方（例）"
+    「scikit-learn の LinearRegression で検量線を作りたいです。
+    標準液の Fe 濃度 [mg/L] が `[0, 0.5, 1, 2, 3, 4]`、吸光度が `[0.001, 0.099, 0.200, 0.398, 0.601, 0.797]` です。
+    X は濃度（2次元配列にする）、y は吸光度です。傾き（単位つき）・切片・R² を表示し、
+    吸光度 0.500 の試料の濃度を**逆算**するコードを書いてください。NumPy と scikit-learn だけを使ってください。」
+
+!!! warning "AIの出力で確かめること"
+    - **X が2次元か**：`print(X.shape)` が `(6, 1)` のように「(サンプル数, 特徴量数)」になっているか。`(6,)` なら `reshape(-1, 1)` が抜けている。
+    - **X と y の向き**：`fit(X, y)` の X が「原因（濃度）」、y が「結果（吸光度）」になっているか。`model.predict` に入れる値は **X と同じ量**（ここでは濃度）でなければならない。吸光度を `predict` に入れていたら誤り。
+    - **傾きの単位と桁**：傾きは「吸光度 / (mg/L)」。Fe-フェナントロリン錯体ならおよそ 0.2 L/mg。桁が 1000 倍ずれていたら、単位（mg/L と g/L など）の取り違えを疑う。
+    - **R² の意味**：`score(X, y)` は学習に使ったデータでの R²。「予測精度」と書かれていたら、未知データでの値ではないと指摘する。
+    - **逆算値を検算する**：求めた濃度を `model.predict([[c]])` に入れ、元の吸光度（0.500）に戻るか確かめる。
 
 ---
 
@@ -104,6 +121,23 @@ model.predict(新しいX)
 **問2.** 問1のモデルで、`x = 50` のときの予測値を表示してください。
 
 **問3.** 1次元配列 `np.array([1, 2, 3])` をそのまま `fit` に渡すとエラーになります。`reshape(-1, 1)` で2次元に直してから使うと動くことを確認してください。
+
+**問4.** 次は、検量線から試料の Fe 濃度を求めるために AI が書いたコードです。問題点を2つ指摘し、直してください。
+
+```python
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+# 鉄(II)-1,10-フェナントロリン錯体の検量線（510 nm, 光路長 1 cm）
+conc = np.array([0.0, 0.5, 1.0, 2.0, 3.0, 4.0])              # Fe 濃度 [mg/L]
+absorb = np.array([0.001, 0.099, 0.200, 0.398, 0.601, 0.797])  # 吸光度
+
+model = LinearRegression()
+model.fit(conc, absorb)
+
+sample_A = 0.500                     # 試料の吸光度
+print("試料の Fe 濃度:", model.predict([[sample_A]]), "mg/L")
+```
 
 ---
 
@@ -141,17 +175,63 @@ model.predict(新しいX)
 ??? success "問3 の解答"
     ```python
     import numpy as np
+    from sklearn.linear_model import LinearRegression
     a = np.array([1, 2, 3])
-    print(a.reshape(-1, 1))     # 2次元になる
+    y = np.array([2.0, 4.1, 5.9])
+    try:
+        LinearRegression().fit(a, y)          # 1次元のまま渡す
+    except ValueError as e:
+        print("エラー:", str(e).splitlines()[0])
+    print(a.reshape(-1, 1))                    # 2次元になる
+    m = LinearRegression().fit(a.reshape(-1, 1), y)
+    print("傾き:", round(m.coef_[0], 2))
     ```
 
     出力:
     ```text
+    エラー: Expected 2D array, got 1D array instead:
     [[1]
      [2]
      [3]]
+    傾き: 1.95
     ```
-    この2次元の形が、scikit-learn の入力 X の正しい形です。
+    `reshape(-1, 1)` で「3行1列」にすると動きます。この2次元の形が、scikit-learn の入力 X の正しい形です。
+
+??? success "問4 の解答"
+    **誤り1**：`conc` が1次元のまま `fit` に渡されています。実行すると `ValueError: Expected 2D array, got 1D array instead` で止まります。`reshape(-1, 1)` で2次元にします。
+
+    **誤り2（化学的な誤り）**：このモデルは「濃度 → 吸光度」を学習しています。`model.predict([[0.500]])` は「濃度 0.500 mg/L のときの吸光度」を返すだけで、試料の濃度にはなりません（誤りを1だけ直して実行すると `[0.10001754]` が出て、単位を「mg/L」と書いてあるため気づきにくい）。吸光度から濃度を求めるには、A = a·c + b を c について解き、c = (A − b) / a と**逆算**します。
+
+    確かめ方：求めた濃度をモデルに入れて、元の吸光度 0.500 に戻るかを見ます。
+
+    ```python
+    import numpy as np
+    from sklearn.linear_model import LinearRegression
+
+    conc = np.array([0.0, 0.5, 1.0, 2.0, 3.0, 4.0]).reshape(-1, 1)  # Fe 濃度 [mg/L]（2次元に）
+    absorb = np.array([0.001, 0.099, 0.200, 0.398, 0.601, 0.797])    # 吸光度
+
+    model = LinearRegression()
+    model.fit(conc, absorb)                   # 濃度 → 吸光度 のモデル
+    a = model.coef_[0]
+    b = model.intercept_
+    print("傾き:", round(a, 4), "(L/mg)")
+    print("切片:", round(b, 4))
+
+    sample_A = 0.500
+    c = (sample_A - b) / a                    # 吸光度 → 濃度 は逆算する
+    print("試料の Fe 濃度:", round(c, 2), "mg/L")
+    print("検算（予測吸光度）:", round(model.predict([[c]])[0], 3))
+    ```
+
+    出力:
+    ```text
+    傾き: 0.1995 (L/mg)
+    切片: 0.0003
+    試料の Fe 濃度: 2.51 mg/L
+    検算（予測吸光度）: 0.5
+    ```
+    傾き約 0.2 L/mg は、モル吸光係数 約 1.1×10⁴ L mol⁻¹ cm⁻¹ の Fe(II)-フェナントロリン錯体として妥当な値です。
 
 ---
 
@@ -159,7 +239,7 @@ model.predict(新しいX)
 
 - scikit-learn の基本型：`model.fit(X, y)` → `model.predict(新X)` → `model.score(X, y)`。
 - 入力 X は**2次元**（行＝サンプル、列＝特徴量）。`reshape(-1, 1)` で直せる。
-- この型は**すべてのモデルで共通**。1つ覚えれば応用が利く。
+- この型は**教師あり学習のモデルで共通**（変換器は fit / transform）。1つ覚えれば応用が利く。
 
 ### 次回予告
 
